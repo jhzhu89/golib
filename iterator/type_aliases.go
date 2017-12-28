@@ -8,6 +8,7 @@ import (
 type (
 	Value = container.Value
 
+	Iter          = Iterator
 	OutputIter    = OutputIterator
 	InputIter     = InputIterator
 	MInputIter    = MutableInputIterator
@@ -22,8 +23,6 @@ type (
 	Cont    = interface{}
 	ContRef = interface{}
 
-	//
-	// *Iter:     the argument can be value or reference of an iterator.
 	// *IterVal:  the argument should be a value of an iterator.
 	// *IterRef:  the argument should be a reference of an iterator.
 	// *IterCRef: the argument should be a refference of an iterator, but the function
@@ -32,11 +31,9 @@ type (
 	//
 
 	// A common tag which means that this iterator could be any type of iterator.
-	Iter      = interface{}
 	IterVal   = interface{}
 	IterRef   = interface{}
 	IterCRef  = interface{}
-	MIter     = interface{}
 	MIterVal  = interface{}
 	MIterRef  = interface{}
 	MIterCRef = interface{}

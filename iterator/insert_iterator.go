@@ -1,7 +1,7 @@
 package iterator
 
 type Inserter interface {
-	Insert(val Value) InputIter
+	Insert(it Iter, val Value) Iter
 }
 
 var _ OutputIter = (*InsertIterator)(nil)
@@ -9,21 +9,21 @@ var _ OutputIter = (*InsertIterator)(nil)
 // An output interator.
 type InsertIterator struct {
 	ins  Inserter
-	iter InputIter
+	iter Iter
 }
 
-func NewInsertIterator(c Inserter, iter InputIter) *InsertIterator {
-	return &InsertIterator{c, iter.Clone().(InputIter)}
+func NewInsertIterator(c Inserter, iter Iter) *InsertIterator {
+	return &InsertIterator{c, iter.Clone().(Iter)}
 }
 
 func (it *InsertIterator) Clone() IterRef {
-	return &InsertIterator{it.ins, it.iter.Clone().(InputIter)}
+	return &InsertIterator{it.ins, it.iter.Clone().(Iter)}
 }
 
 func (it *InsertIterator) CopyAssign(r IterCRef) {
 	var r_ = r.(*InsertIterator)
 	it.ins = r_.ins
-	it.iter = r_.iter.Clone().(InputIter)
+	it.iter = r_.iter.Clone().(Iter)
 }
 
 func (it *InsertIterator) Swap(r IterCRef) {
@@ -33,7 +33,7 @@ func (it *InsertIterator) Swap(r IterCRef) {
 }
 
 func (it *InsertIterator) DerefSet(val Value) {
-	it.iter = it.ins.Insert(val)
+	it.iter = it.ins.Insert(it.iter, val)
 	it.iter.Next()
 }
 

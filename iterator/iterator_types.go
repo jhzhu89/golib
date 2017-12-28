@@ -19,7 +19,8 @@ func (i IteratorType) String() string {
 }
 
 const (
-	Output IteratorType = iota
+	Base IteratorType = iota
+	Output
 	Input
 	MutableInput
 	Forward
@@ -31,6 +32,7 @@ const (
 )
 
 var iteratorType = [...]string{
+	`Iterator`,
 	`OutputIterator`,
 	`InputIterator`,
 	`MutableInputIterator`,
@@ -42,7 +44,7 @@ var iteratorType = [...]string{
 	`MutableRandomAccessIterator`,
 }
 
-type iterator interface {
+type Iterator interface {
 	// it = r
 	CopyAssign(r IterCRef)
 	Swap(r IterCRef)
@@ -52,13 +54,13 @@ type iterator interface {
 }
 
 type OutputIterator interface {
-	iterator
+	Iterator
 	// *it = o
 	DerefSet(Value)
 }
 
 type InputIterator interface {
-	iterator
+	Iterator
 	// *it
 	Deref() Value
 	Equal(r IterCRef) bool
