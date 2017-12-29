@@ -1,0 +1,185 @@
+package deque
+
+import (
+	"github.com/jhzhu89/golib/algorithm"
+	"github.com/jhzhu89/golib/container"
+	"github.com/jhzhu89/golib/iterator"
+)
+
+type (
+	Value = container.Value
+
+	InputIterVal  = iterator.InputIterVal
+	InputIterator = iterator.InputIterator
+
+	RandIterCRef = iterator.RandIterCRef
+
+	ReverseRandIterator = iterator.ReverseRandIterator
+)
+
+// slice backed deque.
+type Deque struct {
+	data          []Value
+	start, finish DequeIter
+}
+
+func New() *Deque {
+	d := &Deque{data: make([]Value, 0)}
+	d.start = DequeIter{data: &d.data}
+	d.finish = DequeIter{data: &d.data}
+	return d
+}
+
+// Iterators
+
+func (d *Deque) Begin() DequeIter {
+	return d.start
+}
+
+func (d *Deque) End() DequeIter {
+	return d.finish
+}
+
+func (d *Deque) RBegin() ReverseRandIterator {
+	return *iterator.NewReverseRandIterator(d.finish)
+}
+
+func (d *Deque) REnd() ReverseRandIterator {
+	return *iterator.NewReverseRandIterator(d.start)
+}
+
+// Capacity
+
+func (d *Deque) Size() int {
+	return len(d.data)
+}
+
+func (d *Deque) Resize(n int, val Value) {
+	d.data = make([]Value, 0, 2*n)
+	for i := 0; i < n; i++ {
+		d.data = append(d.data, val)
+	}
+	d.finish.i = len(d.data)
+}
+
+func (d *Deque) Empty() bool {
+	return d.Size() == 0
+}
+
+func (d *Deque) ShrinkToFit() {
+}
+
+// Element access
+func (d *Deque) At(n int) Value {
+	return d.data[n]
+}
+
+func (d *Deque) Front() Value {
+	return d.data[0]
+}
+
+func (d *Deque) Back() Value {
+	return d.data[d.Size()-1]
+}
+
+// Modifiers
+
+func (d *Deque) eraseAtEnd(pos DequeIter) {
+	d.data = d.data[:pos.i]
+	d.finish = pos
+}
+
+func (d *Deque) AssignRange(first, last InputIterVal) {
+	var size = iterator.Distance(first, last)
+	if size > d.Size() {
+		var mid = first
+		iterator.Advance(iterator.Ref(mid).(InputIterator), d.Size())
+		algorithm.Copy(first, mid, d.Begin())
+		// insert(end(), __mid, __last)
+	} else {
+		d.eraseAtEnd(algorithm.Copy(first, last, d.Begin()).(DequeIter))
+	}
+}
+
+func (d *Deque) AssignFill(size int, val Value) {
+}
+
+func (d *Deque) PushBack(val Value) {
+}
+
+func (d *Deque) PushFront(val Value) {
+}
+
+func (d *Deque) PopBack() {
+}
+
+func (d *Deque) PopFront() {
+}
+
+func (d *Deque) Insert(pos DequeIter, val Value) DequeIter {
+}
+
+func (d *Deque) InsertRange(pos DequeIter, first, last InputIterVal) DequeIter {
+	iterator.Ref(first)
+}
+
+func (d *Deque) InsertFill(pos DequeIter, size int, val Value) DequeIter {
+}
+
+func (d *Deque) Erase(pos DequeIter) DequeIter {
+	return DequeIter{}
+}
+
+func (d *Deque) EraseRange(first, last DequeIter) DequeIter {
+	return DequeIter{}
+}
+
+func (d *Deque) Swap(x *Deque) {
+}
+
+func (d *Deque) Clear() {
+}
+
+var _ iterator.RandomAccessIterator = (*DequeIter)(nil)
+
+// implement a random access iterator.
+type DequeIter struct {
+	data *[]Value
+	i    int
+}
+
+func (it *DequeIter) Get() Value {
+	return (*it.data)[it.i]
+}
+
+func (it *DequeIter) Set(v Value) {
+	(*it.data)[it.i] = v
+}
+
+func (it *DequeIter) Next() {
+	it.i++
+}
+
+func (it *DequeIter) NextN(n int) {
+	it.i += n
+}
+
+func (it *DequeIter) Prev() {
+	it.i--
+}
+
+func (it *DequeIter) PrevN(n int) {
+	it.i -= n
+}
+
+func (it *DequeIter) Equal(r RandIterCRef) bool {
+	return it.i == r.(*DequeIter).i
+}
+
+func (it *DequeIter) LessThan(r RandIterCRef) bool {
+	return it.i < r.(*DequeIter).i
+}
+
+func (it *DequeIter) Distance(r RandIterCRef) int {
+	return r.(*DequeIter).i - it.i
+}
