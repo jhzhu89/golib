@@ -155,13 +155,13 @@ func TestCopy(t *testing.T) {
 		is.insert(begin, 3)
 		is.insert(begin, 4)
 		assert.Equal(t, &intSlice{[]Value{4, 3, 2, 1}}, is)
-		var end = &intSliceIter{&is.data, 2}
+		var end = &intSliceIter{&is.data, 3}
 
 		var it = begin.Clone().(*intSliceIter)
 		it.i = 4
 		var newit = CopyBackward(begin, end, it)
-		assert.Equal(t, &intSlice{[]Value{4, 3, 4, 3}}, is)
-		assert.Equal(t, 2, newit.(*intSliceIter).i)
+		assert.Equal(t, &intSlice{[]Value{4, 4, 3, 2}}, is)
+		assert.Equal(t, 1, newit.(*intSliceIter).i)
 	})
 }
 
