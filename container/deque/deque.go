@@ -146,13 +146,62 @@ func (d *Deque) PushFront(val Value) {
 }
 
 func (d *Deque) PopBack() {
+	if d.finish.cur != 0 {
+		d.finish.cur--
+	} else {
+		d.deallocateNode((*d.map_)[d.finish.node])
+		d.finish.setNode(d.finish.node - 1)
+		d.finish.cur = dequeBufSize - 1
+	}
+	(*(*d.map_)[d.finish.node])[d.finish.cur] = nil
 }
 
 func (d *Deque) PopFront() {
+	(*(*d.map_)[d.start.node])[d.start.cur] = nil
+	if d.start.cur != dequeBufSize-1 {
+		d.start.cur++
+	} else {
+		d.deallocateNode((*d.map_)[d.start.node])
+		d.start.setNode(d.start.node + 1)
+		d.start.cur = 0
+	}
 }
 
 func (d *Deque) Insert(pos *DequeIter, val Value) *DequeIter {
-	return nil
+	if pos.cur == d.start.cur {
+		d.PushFront(val)
+		return d.Begin()
+	} else if pos.cur == d.finish.cur {
+		d.PushBack(val)
+		var it = d.End()
+		it.Prev()
+		return it
+	} else {
+		var index = d.start.Distance(pos)
+		if index < d.Size()/2 {
+			d.PushFront(d.Front())
+			var front1 = d.Begin()
+			front1.Next()
+			var front2 = front1.Clone().(*DequeIter)
+			front2.Next()
+			pos = d.Begin()
+			pos.NextN(index)
+			var pos1 = pos.Clone().(*DequeIter)
+			pos1.Next()
+			algorithm.Copy(front2, pos1, front1)
+		} else {
+			d.PushBack(d.Back())
+			var back1 = d.End()
+			back1.Prev()
+			var back2 = back1.Clone().(*DequeIter)
+			back2.Prev()
+			pos = d.Begin()
+			pos.NextN(index)
+			algorithm.CopyBackward(pos, back2, back1)
+		}
+		(*(*d.map_)[pos.node])[pos.cur] = val
+		return pos
+	}
 }
 
 func (d *Deque) InsertRange(pos *DequeIter, first, last InputIter) *DequeIter {
@@ -264,10 +313,6 @@ func (d *Deque) destroyData(first, last *DequeIter) {
 	} else {
 		destroy((*(*d.map_)[first.node])[first.cur:last.cur])
 	}
-}
-
-func (d *Deque) fillAssign(n int, val Value) {
-
 }
 
 type node []Value
