@@ -164,3 +164,14 @@ func TestCopy(t *testing.T) {
 		assert.Equal(t, 2, newit.(*intSliceIter).i)
 	})
 }
+
+func TestFill(t *testing.T) {
+	var is = new(intSlice)
+	is.data = make([]Value, 5, 5)
+
+	var begin = &intSliceIter{&is.data, 0}
+	var end = &intSliceIter{&is.data, 5}
+
+	Fill(begin, end, 5)
+	assert.Equal(t, &intSlice{[]Value{5, 5, 5, 5, 5}}, is)
+}

@@ -38,6 +38,8 @@ func Distance(it1, it2 InputIter) int {
 
 	default:
 		var n int
+		it1 = it1.Clone().(InputIter)
+		it2 = it2.Clone().(InputIter)
 		for !it1.Equal(it2) {
 			it1.Next()
 			n++

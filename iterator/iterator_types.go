@@ -10,6 +10,8 @@
 // Iterators should have pointer receiver, since some of its
 // methods need to change its internal states.
 //
+// Caller needs to make sure not to modify passed in iterators.
+//
 package iterator
 
 type IteratorType uint8
