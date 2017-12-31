@@ -15,11 +15,15 @@ const (
 type (
 	Value = container.Value
 
+	Iter = iterator.Iter
+
 	IterRef  = iterator.IterRef
 	IterCRef = iterator.IterCRef
 
 	InputIter = iterator.InputIter
 	RandIter  = iterator.RandIter
+
+	ForwardIter = iterator.ForwardIter
 
 	ReverseIter = iterator.ReverseIterator
 )
@@ -57,15 +61,22 @@ func (d *Deque) Resize(newSize int) {
 	if newSize > len {
 		d.deafultAppend(newSize - len)
 	} else if newSize < len {
-		var it = d.start.Clone().(*DequeIter)
+		var it = d.Begin()
 		it.NextN(newSize)
 		d.eraseAtEnd(it)
 	}
 }
 
-//func (d *Deque) ResizeAssign(n int, val Value) {
-//
-//}
+func (d *Deque) ResizeAssign(newSize int, val Value) {
+	var len = d.Size()
+	if newSize > len {
+		d.FillInsert(d.finish, newSize-len, val)
+	} else if newSize < len {
+		var it = d.Begin()
+		it.NextN(newSize)
+		d.eraseAtEnd(it)
+	}
+}
 
 func (d *Deque) ShrinkToFit() bool {
 	// make a new deque and swap it.
@@ -204,12 +215,34 @@ func (d *Deque) Insert(pos *DequeIter, val Value) *DequeIter {
 	}
 }
 
+type insertFunc func(it Iter, val Value) Iter
+
+func (i insertFunc) Insert(it Iter, val Value) Iter {
+	return i(it, val)
+}
+
 func (d *Deque) InsertRange(pos *DequeIter, first, last InputIter) *DequeIter {
+	switch first.(type) {
+	case ForwardIter:
+
+	default:
+		algorithm.Copy(first, last,
+			iterator.NewInsertIterator(
+				insertFunc(func(it Iter, val Value) Iter {
+					return d.Insert(it.(*DequeIter), val)
+				}), pos,
+			),
+		)
+	}
 	return nil
 }
 
-func (d *Deque) FillInsert(pos *DequeIter, size int, val Value) *DequeIter {
-	return nil
+func (d *Deque) FillInsert(pos *DequeIter, n int, val Value) *DequeIter {
+	var offset = d.start.Distance(pos)
+	d.fillInsert(pos, n, val)
+	var it = d.Begin()
+	it.NextN(offset)
+	return it
 }
 
 func (d *Deque) Erase(pos *DequeIter) *DequeIter {
@@ -237,7 +270,7 @@ func (d *Deque) reserveElementsAtBack(n int) *DequeIter {
 	if n > vacancies {
 		d.newElementsAtBack(n - vacancies)
 	}
-	var it = d.finish.Clone().(*DequeIter)
+	var it = d.End()
 	it.NextN(n)
 	return it
 }
@@ -247,7 +280,7 @@ func (d *Deque) newElementsAtBack(newElems int) {
 	var newNodes = (newElems + dequeBufSize - 1) / dequeBufSize
 	d.reserveMapAtBack(newNodes)
 	for i := 0; i < newNodes; i++ {
-		(*d.map_)[d.finish.node+1] = d.allocateNode()
+		(*d.map_)[d.finish.node+i] = d.allocateNode()
 	}
 }
 
@@ -312,6 +345,60 @@ func (d *Deque) destroyData(first, last *DequeIter) {
 		destroy((*(*d.map_)[last.node])[:last.cur])
 	} else {
 		destroy((*(*d.map_)[first.node])[first.cur:last.cur])
+	}
+}
+
+func (d *Deque) fillInsert(pos *DequeIter, n int, val Value) {
+	if pos.cur == d.start.cur {
+		var newStart = d.reserveElementsAtFront(n)
+		algorithm.Fill(newStart, d.start, val)
+		d.start = newStart
+	} else if pos.cur == d.finish.cur {
+		var newFinish = d.reserveElementsAtBack(n)
+		algorithm.Fill(d.finish, newFinish, val)
+		d.finish = newFinish
+	} else {
+		var elemsBefore = d.start.Distance(pos)
+		var len = d.Size()
+		if elemsBefore < len/2 {
+			var newStart = d.reserveElementsAtFront(n)
+			pos = d.start.Clone().(*DequeIter)
+			pos.NextN(elemsBefore)
+			algorithm.Copy(d.start, pos, newStart)
+			d.start = newStart
+			var prev = pos.Clone().(*DequeIter)
+			prev.PrevN(n)
+			algorithm.Fill(prev, pos, val)
+		} else {
+			var newFinish = d.reserveElementsAtBack(n)
+			var elemsAfter = len - elemsBefore
+			var pos = d.finish.Clone().(*DequeIter)
+			pos.PrevN(elemsAfter)
+			algorithm.CopyBackward(pos, d.finish, newFinish)
+			d.finish = newFinish
+			var post = pos.Clone().(*DequeIter)
+			post.NextN(n)
+			algorithm.Fill(pos, post, val)
+		}
+	}
+}
+
+func (d *Deque) reserveElementsAtFront(n int) *DequeIter {
+	var vacancies = d.start.cur
+	if n > vacancies {
+		d.newElementsAtFront(n - vacancies)
+	}
+	var it = d.Begin()
+	it.PrevN(n)
+	return it
+}
+
+func (d *Deque) newElementsAtFront(newElems int) {
+	// TODO: add size limit?
+	var newNodes = (newElems + dequeBufSize - 1) / dequeBufSize
+	d.reserveMapAtFront(newNodes)
+	for i := 0; i < newNodes; i++ {
+		(*d.map_)[d.start.node-i] = d.allocateNode()
 	}
 }
 
