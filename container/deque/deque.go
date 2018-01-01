@@ -222,8 +222,43 @@ func (i insertFunc) Insert(it Iter, val Value) Iter {
 }
 
 func (d *Deque) InsertRange(pos *DequeIter, first, last InputIter) *DequeIter {
+	var offset = d.start.Distance(pos)
+
 	switch first.(type) {
 	case ForwardIter:
+		var n = iterator.Distance(first, last)
+		if pos.cur == d.start.cur {
+			var newStart = d.reserveElementsAtFront(n)
+			algorithm.Copy(first, last, newStart)
+			d.start = newStart
+		} else if pos.cur == d.finish.cur {
+			var newFinish = d.reserveElementsAtBack(n)
+			algorithm.Copy(first, last, d.finish)
+			d.finish = newFinish
+		} else {
+			var elemsBefore = d.start.Distance(pos)
+			var len = d.Size()
+			if elemsBefore < len/2 {
+				var newStart = d.reserveElementsAtFront(n)
+				pos = d.start.Clone().(*DequeIter)
+				pos.NextN(elemsBefore)
+				algorithm.Copy(d.start, pos, newStart)
+				d.start = newStart
+				var prev = pos.Clone().(*DequeIter)
+				prev.PrevN(n)
+				algorithm.Copy(first, last, prev)
+			} else {
+				var newFinish = d.reserveElementsAtBack(n)
+				var elemsAfter = len - elemsBefore
+				var pos = d.finish.Clone().(*DequeIter)
+				pos.PrevN(elemsAfter)
+				algorithm.CopyBackward(pos, d.finish, newFinish)
+				d.finish = newFinish
+				var post = pos.Clone().(*DequeIter)
+				post.NextN(n)
+				algorithm.Copy(first, last, pos)
+			}
+		}
 
 	default:
 		algorithm.Copy(first, last,
@@ -234,7 +269,9 @@ func (d *Deque) InsertRange(pos *DequeIter, first, last InputIter) *DequeIter {
 			),
 		)
 	}
-	return nil
+	var it = d.Begin()
+	it.NextN(offset)
+	return it
 }
 
 func (d *Deque) FillInsert(pos *DequeIter, n int, val Value) *DequeIter {
