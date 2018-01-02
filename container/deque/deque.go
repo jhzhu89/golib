@@ -75,8 +75,20 @@ func (d *Deque) ResizeAssign(newSize int, val Value) {
 }
 
 func (d *Deque) ShrinkToFit() bool {
-	// make a new deque and swap it.
-	return false
+	var frontCapacity = d.start.cur
+	if frontCapacity == 0 {
+		return false
+	}
+
+	var backCapacity = dequeBufSize - d.finish.cur
+	if frontCapacity+backCapacity < dequeBufSize {
+		return false
+	}
+
+	var x = new(Deque)
+	x.rangeInitialize(d.start, d.finish)
+	d.Swap(x)
+	return true
 }
 
 func (d *Deque) Empty() bool {
@@ -298,9 +310,14 @@ func (d *Deque) EraseRange(first, last *DequeIter) *DequeIter {
 }
 
 func (d *Deque) Swap(x *Deque) {
+	d.start, x.start = x.start, d.start
+	d.finish, x.finish = x.finish, d.finish
+	d.map_, x.map_ = x.map_, d.map_
+	d.mapSize, x.mapSize = x.mapSize, d.mapSize
 }
 
 func (d *Deque) Clear() {
+	d.eraseAtEnd(d.start)
 }
 
 func (d *Deque) deafultAppend(n int) {
@@ -439,6 +456,21 @@ func (d *Deque) newElementsAtFront(newElems int) {
 	d.reserveMapAtFront(newNodes)
 	for i := 0; i < newNodes; i++ {
 		(*d.map_)[d.start.node-i] = d.allocateNode()
+	}
+}
+
+func (d *Deque) rangeInitialize(first, last InputIter) {
+	switch first.(type) {
+	case ForwardIter:
+		var n = iterator.Distance(first, last)
+		d.initializeMap(n)
+		algorithm.Copy(first, last, d.start)
+
+	default:
+		d.initializeMap(0)
+		for first = first.Clone().(InputIter); !first.Equal(last); first.Next() {
+			d.PushBack(first.Deref())
+		}
 	}
 }
 
