@@ -32,6 +32,31 @@ type Deque struct {
 	dequeImpl
 }
 
+func newDeque() *Deque {
+	d := new(Deque)
+	d.start = &DequeIter{map_: &d.map_}
+	d.finish = &DequeIter{map_: &d.map_}
+	return d
+}
+
+func NewDeque() *Deque {
+	d := newDeque()
+	d.initializeMap(0)
+	return d
+}
+
+func NewDequeN(n int) *Deque {
+	d := newDeque()
+	d.initializeMap(n)
+	return d
+}
+
+func NewDequeFromRange(first, last InputIter) *Deque {
+	d := newDeque()
+	d.rangeInitialize(first, last)
+	return d
+}
+
 // Iterators
 
 func (d *Deque) Begin() *DequeIter {
@@ -525,7 +550,7 @@ func (i *dequeImpl) deallocateNode(n *node) {
 }
 
 func (i *dequeImpl) allocateMap(size int) *nodeMap {
-	var map_ = make(nodeMap, 0, size)
+	var map_ = make(nodeMap, size, size)
 	return &map_
 }
 

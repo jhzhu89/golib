@@ -6,7 +6,7 @@ var _ RandIter = (*DequeIter)(nil)
 type DequeIter struct {
 	cur  int
 	node int
-	map_ *[]*node
+	map_ **nodeMap
 }
 
 func (it *DequeIter) CanMultiPass() {}
@@ -27,11 +27,11 @@ func (it *DequeIter) Swap(r IterCRef) {
 }
 
 func (it *DequeIter) Deref() Value {
-	return (*(*it.map_)[it.node])[it.cur]
+	return (*(*(*it.map_))[it.node])[it.cur]
 }
 
 func (it *DequeIter) DerefSet(val Value) {
-	(*(*it.map_)[it.node])[it.cur] = val
+	(*(*(*it.map_))[it.node])[it.cur] = val
 }
 
 func (it *DequeIter) setNode(newNode int) {
