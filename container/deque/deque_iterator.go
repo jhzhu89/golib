@@ -98,3 +98,27 @@ func max(a, b int) int {
 	}
 	return b
 }
+
+func nextN(it *DequeIter, n int) *DequeIter {
+	it.NextN(n)
+	return it
+}
+
+func prevN(it *DequeIter, n int) *DequeIter {
+	it.PrevN(n)
+	return it
+}
+
+func next(it *DequeIter) *DequeIter {
+	it.Next()
+	return it
+}
+
+func prev(it *DequeIter) *DequeIter {
+	it.Prev()
+	return it
+}
+
+func clone(it *DequeIter) *DequeIter {
+	return &DequeIter{it.cur, it.node, it.map_}
+}
