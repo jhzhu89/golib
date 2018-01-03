@@ -140,9 +140,11 @@ func TestDequeMethods(t *testing.T) {
 
 		test(1, 1, 0, 3, 1, 3, 1, false)
 		test(dequeBufSize-1, 1, 0, 3, dequeBufSize-1, 3, dequeBufSize-1, false)
-		test(dequeBufSize, 1, 0, 3, 0, 4, dequeBufSize, false)
+		test(dequeBufSize, 2, 0, 3, 0, 4, dequeBufSize, false)
+		test(2*dequeBufSize-1, 2, 0, 3, 511, 4, 2*dequeBufSize-1, false)
+		test(2*dequeBufSize, 3, 0, 3, 0, 5, 2*dequeBufSize, false)
 		// cause reallocate map
-		test(8*dequeBufSize, 8, 0, 4, 0, 12, dequeBufSize*8, false)
+		test(8*dequeBufSize, 9, 0, 4, 0, 12, dequeBufSize*8, false)
 	})
 
 	t.Run(`ResizeAssign`, func(t *testing.T) {
@@ -185,6 +187,12 @@ func TestDequeMethods(t *testing.T) {
 		d.PushBack(1)
 		assert.Equal(t, 1, d.Size())
 		assert.Equal(t, 11, len(*d.map_))
+		assert.False(t, d.ShrinkToFit())
+
+		d.FillAssign(dequeBufSize, 1)
+		for i := 0; i < dequeBufSize*2/3; i++ {
+			d.PopFront()
+		}
 		assert.True(t, d.ShrinkToFit())
 		assert.Equal(t, 8, len(*d.map_))
 	})

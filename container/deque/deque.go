@@ -110,7 +110,7 @@ func (d *Deque) ShrinkToFit() bool {
 		return false
 	}
 
-	var x = new(Deque)
+	var x = NewDequeN(d.Size())
 	x.rangeInitialize(d.start, d.finish)
 	d.Swap(x)
 	return true
