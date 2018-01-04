@@ -75,3 +75,207 @@ func TestFillInsert(t *testing.T) {
 	d = NewDequeN(10)
 	test(d, nextN(d.Begin(), 5), 8*dequeBufSize, 0, 4, 10, 12, 8*dequeBufSize+10, 9, false)
 }
+
+func TestNewElementsAt(t *testing.T) {
+	var test = func(front bool, elems, numNonEmptyNodes int) {
+		var d = NewDeque()
+		if front {
+			d.newElementsAtFront(elems)
+		} else {
+			d.newElementsAtBack(elems)
+		}
+
+		var nonEmpty int
+		for i := 0; i < len(*d.map_); i++ {
+			if (*d.map_)[i] != nil {
+				nonEmpty++
+			}
+		}
+		assert.Equal(t, numNonEmptyNodes, nonEmpty)
+	}
+
+	t.Run(`Front`, func(t *testing.T) {
+		test(true, 1, 2)
+		test(true, dequeBufSize, 2)
+		test(true, dequeBufSize+1, 3)
+	})
+
+	t.Run(`Back`, func(t *testing.T) {
+		test(false, 1, 2)
+		test(false, dequeBufSize, 2)
+		test(false, dequeBufSize+1, 3)
+	})
+}
+
+func TestDestroyData(t *testing.T) {
+	var d = NewDequeN(2 * dequeBufSize)
+	d.FillAssign(2*dequeBufSize, 10)
+
+	var countNonNil = func() int {
+		var c int
+		for it := d.Begin(); !it.Equal(d.End()); it.Next() {
+			if it.Deref() != nil {
+				c++
+			}
+		}
+		return c
+	}
+
+	assert.Equal(t, 2*dequeBufSize, countNonNil())
+
+	d.destroyData(d.Begin(), d.End())
+	assert.Equal(t, 2*dequeBufSize, d.Size())
+	assert.Equal(t, 0, countNonNil())
+}
+
+func TestEraseAt(t *testing.T) {
+	var countNonNilNodes = func(d *Deque) int {
+		var n int
+		for _, node := range *d.map_ {
+			if node != nil {
+				n++
+			}
+		}
+		return n
+	}
+
+	t.Run(`Begin`, func(t *testing.T) {
+		var d = NewDequeN(2 * dequeBufSize)
+		d.FillAssign(2*dequeBufSize, 1)
+
+		var pos = nextN(d.Begin(), dequeBufSize-1)
+		d.eraseAtBegin(pos)
+		assert.Equal(t, dequeBufSize-1, d.start.cur)
+		assert.Equal(t, 3, countNonNilNodes(d))
+		pos = next(pos)
+		d.eraseAtBegin(pos)
+		assert.Equal(t, 0, d.start.cur)
+		assert.Equal(t, 2, countNonNilNodes(d))
+	})
+
+	t.Run(`End`, func(t *testing.T) {
+		var d = NewDequeN(2 * dequeBufSize)
+		d.FillAssign(2*dequeBufSize, 1)
+
+		var pos = nextN(d.Begin(), dequeBufSize)
+		d.eraseAtEnd(pos)
+		assert.Equal(t, 0, d.finish.cur)
+		assert.Equal(t, 2, countNonNilNodes(d))
+		pos = prev(pos)
+		d.eraseAtEnd(pos)
+		assert.Equal(t, dequeBufSize-1, d.finish.cur)
+		assert.Equal(t, 1, countNonNilNodes(d))
+	})
+}
+
+func TestDequeMethodsWhitebox(t *testing.T) {
+	t.Run(`BeginAndEnd`, func(t *testing.T) {
+		var check = func(l, r *DequeIter) {
+			assert.Equal(t, l.map_, r.map_)
+			assert.Equal(t, l.cur, r.cur)
+			assert.Equal(t, l.node, r.node)
+			assert.NotEqual(t, fmt.Sprintf("%x", &l), fmt.Sprintf("%x", &r))
+		}
+
+		var d = NewDeque()
+		check(d.start, d.Begin())
+		check(d.finish, d.End())
+	})
+
+	t.Run(`Resize`, func(t *testing.T) {
+		test := func(toSize, numNonEmptyNodes, startCur, startNode, finishCur,
+			finishNode, size int, empty bool) {
+			d := NewDeque()
+			d.Resize(toSize)
+			var nonEmpty int
+			for i := 0; i < len(*d.map_); i++ {
+				if (*d.map_)[i] != nil {
+					nonEmpty++
+				}
+			}
+			assert.Equal(t, numNonEmptyNodes, nonEmpty)
+
+			assert.Equal(t, startCur, d.start.cur)
+			assert.Equal(t, startNode, d.start.node)
+
+			assert.Equal(t, finishCur, d.finish.cur)
+			assert.Equal(t, finishNode, d.finish.node)
+
+			assert.Equal(t, size, d.Size())
+			assert.Equal(t, empty, d.Empty())
+		}
+
+		test(1, 1, 0, 3, 1, 3, 1, false)
+		test(dequeBufSize-1, 1, 0, 3, dequeBufSize-1, 3, dequeBufSize-1, false)
+		test(dequeBufSize, 2, 0, 3, 0, 4, dequeBufSize, false)
+		test(2*dequeBufSize-1, 2, 0, 3, 511, 4, 2*dequeBufSize-1, false)
+		test(2*dequeBufSize, 3, 0, 3, 0, 5, 2*dequeBufSize, false)
+		// cause reallocate map
+		test(8*dequeBufSize, 9, 0, 4, 0, 12, dequeBufSize*8, false)
+	})
+
+	t.Run(`PushOrPop`, func(t *testing.T) {
+		const (
+			pushBack = iota
+			pushFront
+			popBack
+			popFront
+		)
+
+		test := func(d *Deque, op int, numNonEmptyNodes, startCur, startNode, finishCur, finishNode, size int, empty bool) {
+			switch op {
+			case pushBack:
+				d.PushBack(1)
+			case pushFront:
+				d.PushFront(1)
+			case popBack:
+				d.PopBack()
+			case popFront:
+				d.PopFront()
+			}
+
+			assert.Equal(t, startCur, d.start.cur)
+			assert.Equal(t, startNode, d.start.node)
+
+			assert.Equal(t, finishCur, d.finish.cur)
+			assert.Equal(t, finishNode, d.finish.node)
+
+			assert.Equal(t, size, d.Size())
+			assert.Equal(t, empty, d.Empty())
+
+			var nonEmpty int
+			for _, node := range *d.map_ {
+				if node != nil && *node != nil {
+					nonEmpty++
+				}
+			}
+			assert.Equal(t, numNonEmptyNodes, nonEmpty)
+		}
+
+		t.Run(`Push`, func(t *testing.T) {
+			t.Run(`Back`, func(t *testing.T) {
+				test(NewDeque(), pushBack, 1, 0, 3, 1, 3, 1, false)
+				test(NewDequeN(dequeBufSize-1), pushBack, 2, 0, 3, 0, 4, dequeBufSize, false)
+			})
+
+			t.Run(`Front`, func(t *testing.T) {
+				test(NewDeque(), pushFront, 2, dequeBufSize-1, 2, 0, 3, 1, false)
+			})
+		})
+
+		t.Run(`Pop`, func(t *testing.T) {
+			t.Run(`Back`, func(t *testing.T) {
+				test(NewDequeN(1), popBack, 1, 0, 3, 0, 3, 0, true)
+				test(NewDequeN(dequeBufSize), popBack, 1, 0, 3, dequeBufSize-1, 3, dequeBufSize-1, false)
+			})
+
+			t.Run(`Front`, func(t *testing.T) {
+				test(NewDequeN(1), popFront, 1, 1, 3, 1, 3, 0, true)
+
+				var d = NewDequeN(2 * dequeBufSize)
+				d.eraseAtBegin(nextN(d.Begin(), dequeBufSize-1))
+				test(d, popFront, 2, 0, 3, 0, 4, dequeBufSize, false)
+			})
+		})
+	})
+}

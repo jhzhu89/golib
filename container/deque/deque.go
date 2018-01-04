@@ -295,8 +295,7 @@ func (d *Deque) FillInsert(pos *DequeIter, n int, val Value) *DequeIter {
 }
 
 func (d *Deque) Erase(pos *DequeIter) *DequeIter {
-	var next = pos.Clone().(*DequeIter)
-	next.Next()
+	var next = next(clone(pos))
 	var index = d.start.Distance(pos)
 	if index < d.Size()>>1 {
 		algorithm.CopyBackward(d.start, pos, next)
@@ -374,6 +373,23 @@ func (d *Deque) reserveMapAtBack(nodesToAdd int) {
 	}
 }
 
+func (d *Deque) reserveElementsAtFront(n int) *DequeIter {
+	var vacancies = d.start.cur
+	if n > vacancies {
+		d.newElementsAtFront(n - vacancies)
+	}
+	return prevN(clone(d.start), n)
+}
+
+func (d *Deque) newElementsAtFront(newElems int) {
+	// TODO: add size limit?
+	var newNodes = (newElems + dequeBufSize - 1) / dequeBufSize
+	d.reserveMapAtFront(newNodes)
+	for i := 1; i <= newNodes; i++ {
+		(*d.map_)[d.start.node-i] = d.allocateNode()
+	}
+}
+
 func (d *Deque) reserveMapAtFront(nodesToAdd int) {
 	if nodesToAdd > d.start.node {
 		d.reallocateMap(nodesToAdd, true)
@@ -416,7 +432,7 @@ func (d *Deque) eraseAtEnd(pos *DequeIter) {
 func (d *Deque) eraseAtBegin(pos *DequeIter) {
 	d.destroyData(d.start, pos)
 	d.destroyNodes(d.start.node, pos.node)
-	d.start = pos
+	d.start = clone(pos)
 }
 
 func (d *Deque) destroyData(first, last *DequeIter) {
@@ -464,23 +480,6 @@ func (d *Deque) fillInsert(pos *DequeIter, n int, val Value) {
 			d.finish = newFinish
 			algorithm.Fill(pos, nextN(clone(pos), n), val)
 		}
-	}
-}
-
-func (d *Deque) reserveElementsAtFront(n int) *DequeIter {
-	var vacancies = d.start.cur
-	if n > vacancies {
-		d.newElementsAtFront(n - vacancies)
-	}
-	return prevN(clone(d.start), n)
-}
-
-func (d *Deque) newElementsAtFront(newElems int) {
-	// TODO: add size limit?
-	var newNodes = (newElems + dequeBufSize - 1) / dequeBufSize
-	d.reserveMapAtFront(newNodes)
-	for i := 1; i <= newNodes; i++ {
-		(*d.map_)[d.start.node-i] = d.allocateNode()
 	}
 }
 
