@@ -210,6 +210,7 @@ func (d *Deque) PopFront() {
 }
 
 func (d *Deque) Insert(pos *DequeIter, val Value) *DequeIter {
+	pos = clone(pos)
 	if pos.cur == d.start.cur {
 		d.PushFront(val)
 		return d.Begin()
@@ -244,6 +245,7 @@ func (i insertFunc) Insert(it Iter, val Value) Iter {
 }
 
 func (d *Deque) InsertRange(pos *DequeIter, first, last InputIter) *DequeIter {
+	pos = clone(pos)
 	var offset = d.start.Distance(pos)
 
 	switch first.(type) {
@@ -455,6 +457,7 @@ func (d *Deque) destroyData(first, last *DequeIter) {
 }
 
 func (d *Deque) fillInsert(pos *DequeIter, n int, val Value) {
+	pos = clone(pos)
 	if pos.cur == d.start.cur {
 		var newStart = d.reserveElementsAtFront(n)
 		algorithm.Fill(newStart, d.start, val)
