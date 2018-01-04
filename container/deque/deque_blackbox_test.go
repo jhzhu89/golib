@@ -27,7 +27,7 @@ func (it *vectorIter) Next()                 { it.i++ }
 func (it *vectorIter) Equal(r IterCRef) bool { return it.i == r.(*vectorIter).i }
 func (it *vectorIter) CanMultiPass()         {}
 
-var dequeBufSize = 512
+var dequeBufSize = DequeBufSize
 
 func TestNewDeque(t *testing.T) {
 	t.Run(`NewDeque`, func(t *testing.T) {

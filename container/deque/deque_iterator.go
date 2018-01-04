@@ -56,17 +56,17 @@ func (it *DequeIter) Prev() {
 
 func (it *DequeIter) NextN(n int) {
 	var offset = n + it.cur
-	if offset >= 0 && offset < dequeBufSize {
+	if offset >= 0 && offset < DequeBufSize {
 		it.cur += n
 	} else {
 		var nodeOffset int
 		if offset > 0 {
-			nodeOffset = offset / dequeBufSize
+			nodeOffset = offset / DequeBufSize
 		} else {
-			nodeOffset = -(-offset-1)/dequeBufSize - 1
+			nodeOffset = -(-offset-1)/DequeBufSize - 1
 		}
 		it.setNode(it.node + nodeOffset)
-		it.cur = offset - nodeOffset*dequeBufSize
+		it.cur = offset - nodeOffset*DequeBufSize
 	}
 }
 
@@ -88,7 +88,7 @@ func (it *DequeIter) LessThan(r IterCRef) bool {
 
 func (it *DequeIter) Distance(r IterCRef) int {
 	var r_ = r.(*DequeIter)
-	return (r_.node-it.node)*dequeBufSize + r_.cur - it.cur
+	return (r_.node-it.node)*DequeBufSize + r_.cur - it.cur
 }
 
 // util funcs

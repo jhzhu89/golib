@@ -58,22 +58,22 @@ func TestFillInsert(t *testing.T) {
 	}
 
 	var d = NewDeque()
-	test(d, d.Begin(), 1, dequeBufSize-1, 2, 0, 3, 1, 2, false)
+	test(d, d.Begin(), 1, DequeBufSize-1, 2, 0, 3, 1, 2, false)
 	d = NewDeque()
-	test(d, d.Begin(), dequeBufSize, 0, 2, 0, 3, dequeBufSize, 2, false)
+	test(d, d.Begin(), DequeBufSize, 0, 2, 0, 3, DequeBufSize, 2, false)
 
 	d = NewDequeN(1)
 	test(d, d.End(), 1, 0, 3, 2, 3, 2, 1, false)
 	d = NewDequeN(1)
-	test(d, d.End(), dequeBufSize, 0, 3, 1, 4, dequeBufSize+1, 2, false)
+	test(d, d.End(), DequeBufSize, 0, 3, 1, 4, DequeBufSize+1, 2, false)
 
 	d = NewDequeN(10)
 	test(d, nextN(d.Begin(), 5), 1, 0, 3, 11, 3, 11, 1, false)
 	d = NewDequeN(10)
-	test(d, nextN(d.Begin(), 5), dequeBufSize, 0, 3, 10, 4, dequeBufSize+10, 2, false)
+	test(d, nextN(d.Begin(), 5), DequeBufSize, 0, 3, 10, 4, DequeBufSize+10, 2, false)
 
 	d = NewDequeN(10)
-	test(d, nextN(d.Begin(), 5), 8*dequeBufSize, 0, 4, 10, 12, 8*dequeBufSize+10, 9, false)
+	test(d, nextN(d.Begin(), 5), 8*DequeBufSize, 0, 4, 10, 12, 8*DequeBufSize+10, 9, false)
 }
 
 func TestNewElementsAt(t *testing.T) {
@@ -96,20 +96,20 @@ func TestNewElementsAt(t *testing.T) {
 
 	t.Run(`Front`, func(t *testing.T) {
 		test(true, 1, 2)
-		test(true, dequeBufSize, 2)
-		test(true, dequeBufSize+1, 3)
+		test(true, DequeBufSize, 2)
+		test(true, DequeBufSize+1, 3)
 	})
 
 	t.Run(`Back`, func(t *testing.T) {
 		test(false, 1, 2)
-		test(false, dequeBufSize, 2)
-		test(false, dequeBufSize+1, 3)
+		test(false, DequeBufSize, 2)
+		test(false, DequeBufSize+1, 3)
 	})
 }
 
 func TestDestroyData(t *testing.T) {
-	var d = NewDequeN(2 * dequeBufSize)
-	d.FillAssign(2*dequeBufSize, 10)
+	var d = NewDequeN(2 * DequeBufSize)
+	d.FillAssign(2*DequeBufSize, 10)
 
 	var countNonNil = func() int {
 		var c int
@@ -121,10 +121,10 @@ func TestDestroyData(t *testing.T) {
 		return c
 	}
 
-	assert.Equal(t, 2*dequeBufSize, countNonNil())
+	assert.Equal(t, 2*DequeBufSize, countNonNil())
 
 	d.destroyData(d.Begin(), d.End())
-	assert.Equal(t, 2*dequeBufSize, d.Size())
+	assert.Equal(t, 2*DequeBufSize, d.Size())
 	assert.Equal(t, 0, countNonNil())
 }
 
@@ -140,12 +140,12 @@ func TestEraseAt(t *testing.T) {
 	}
 
 	t.Run(`Begin`, func(t *testing.T) {
-		var d = NewDequeN(2 * dequeBufSize)
-		d.FillAssign(2*dequeBufSize, 1)
+		var d = NewDequeN(2 * DequeBufSize)
+		d.FillAssign(2*DequeBufSize, 1)
 
-		var pos = nextN(d.Begin(), dequeBufSize-1)
+		var pos = nextN(d.Begin(), DequeBufSize-1)
 		d.eraseAtBegin(pos)
-		assert.Equal(t, dequeBufSize-1, d.start.cur)
+		assert.Equal(t, DequeBufSize-1, d.start.cur)
 		assert.Equal(t, 3, countNonNilNodes(d))
 		pos = next(pos)
 		d.eraseAtBegin(pos)
@@ -154,16 +154,16 @@ func TestEraseAt(t *testing.T) {
 	})
 
 	t.Run(`End`, func(t *testing.T) {
-		var d = NewDequeN(2 * dequeBufSize)
-		d.FillAssign(2*dequeBufSize, 1)
+		var d = NewDequeN(2 * DequeBufSize)
+		d.FillAssign(2*DequeBufSize, 1)
 
-		var pos = nextN(d.Begin(), dequeBufSize)
+		var pos = nextN(d.Begin(), DequeBufSize)
 		d.eraseAtEnd(pos)
 		assert.Equal(t, 0, d.finish.cur)
 		assert.Equal(t, 2, countNonNilNodes(d))
 		pos = prev(pos)
 		d.eraseAtEnd(pos)
-		assert.Equal(t, dequeBufSize-1, d.finish.cur)
+		assert.Equal(t, DequeBufSize-1, d.finish.cur)
 		assert.Equal(t, 1, countNonNilNodes(d))
 	})
 }
@@ -206,12 +206,12 @@ func TestDequeMethodsWhitebox(t *testing.T) {
 		}
 
 		test(1, 1, 0, 3, 1, 3, 1, false)
-		test(dequeBufSize-1, 1, 0, 3, dequeBufSize-1, 3, dequeBufSize-1, false)
-		test(dequeBufSize, 2, 0, 3, 0, 4, dequeBufSize, false)
-		test(2*dequeBufSize-1, 2, 0, 3, 511, 4, 2*dequeBufSize-1, false)
-		test(2*dequeBufSize, 3, 0, 3, 0, 5, 2*dequeBufSize, false)
+		test(DequeBufSize-1, 1, 0, 3, DequeBufSize-1, 3, DequeBufSize-1, false)
+		test(DequeBufSize, 2, 0, 3, 0, 4, DequeBufSize, false)
+		test(2*DequeBufSize-1, 2, 0, 3, 511, 4, 2*DequeBufSize-1, false)
+		test(2*DequeBufSize, 3, 0, 3, 0, 5, 2*DequeBufSize, false)
 		// cause reallocate map
-		test(8*dequeBufSize, 9, 0, 4, 0, 12, dequeBufSize*8, false)
+		test(8*DequeBufSize, 9, 0, 4, 0, 12, DequeBufSize*8, false)
 	})
 
 	t.Run(`PushOrPop`, func(t *testing.T) {
@@ -255,26 +255,26 @@ func TestDequeMethodsWhitebox(t *testing.T) {
 		t.Run(`Push`, func(t *testing.T) {
 			t.Run(`Back`, func(t *testing.T) {
 				test(NewDeque(), pushBack, 1, 0, 3, 1, 3, 1, false)
-				test(NewDequeN(dequeBufSize-1), pushBack, 2, 0, 3, 0, 4, dequeBufSize, false)
+				test(NewDequeN(DequeBufSize-1), pushBack, 2, 0, 3, 0, 4, DequeBufSize, false)
 			})
 
 			t.Run(`Front`, func(t *testing.T) {
-				test(NewDeque(), pushFront, 2, dequeBufSize-1, 2, 0, 3, 1, false)
+				test(NewDeque(), pushFront, 2, DequeBufSize-1, 2, 0, 3, 1, false)
 			})
 		})
 
 		t.Run(`Pop`, func(t *testing.T) {
 			t.Run(`Back`, func(t *testing.T) {
 				test(NewDequeN(1), popBack, 1, 0, 3, 0, 3, 0, true)
-				test(NewDequeN(dequeBufSize), popBack, 1, 0, 3, dequeBufSize-1, 3, dequeBufSize-1, false)
+				test(NewDequeN(DequeBufSize), popBack, 1, 0, 3, DequeBufSize-1, 3, DequeBufSize-1, false)
 			})
 
 			t.Run(`Front`, func(t *testing.T) {
 				test(NewDequeN(1), popFront, 1, 1, 3, 1, 3, 0, true)
 
-				var d = NewDequeN(2 * dequeBufSize)
-				d.eraseAtBegin(nextN(d.Begin(), dequeBufSize-1))
-				test(d, popFront, 2, 0, 3, 0, 4, dequeBufSize, false)
+				var d = NewDequeN(2 * DequeBufSize)
+				d.eraseAtBegin(nextN(d.Begin(), DequeBufSize-1))
+				test(d, popFront, 2, 0, 3, 0, 4, DequeBufSize, false)
 			})
 		})
 	})

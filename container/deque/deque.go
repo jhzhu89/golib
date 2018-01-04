@@ -7,9 +7,9 @@ import (
 )
 
 const (
-	dequeBufSize   = 512
-	nodeEnd        = dequeBufSize
-	initialMapSize = 8
+	DequeBufSize   = 512
+	nodeEnd        = DequeBufSize
+	InitialMapSize = 8
 )
 
 type (
@@ -105,8 +105,8 @@ func (d *Deque) ShrinkToFit() bool {
 		return false
 	}
 
-	var backCapacity = dequeBufSize - d.finish.cur
-	if frontCapacity+backCapacity < dequeBufSize {
+	var backCapacity = DequeBufSize - d.finish.cur
+	if frontCapacity+backCapacity < DequeBufSize {
 		return false
 	}
 
@@ -162,7 +162,7 @@ func (d *Deque) AssignRange(first, last InputIter) {
 }
 
 func (d *Deque) PushBack(val Value) {
-	if d.finish.cur != dequeBufSize-1 {
+	if d.finish.cur != DequeBufSize-1 {
 		(*(*d.map_)[d.finish.node])[d.finish.cur] = val
 		d.finish.cur++
 	} else {
@@ -182,7 +182,7 @@ func (d *Deque) PushFront(val Value) {
 		d.reserveMapAtFront(1)
 		(*d.map_)[d.start.node-1] = d.allocateNode()
 		d.start.setNode(d.start.node - 1)
-		d.start.cur = dequeBufSize - 1
+		d.start.cur = DequeBufSize - 1
 		(*(*d.map_)[d.start.node])[d.start.cur] = val
 	}
 }
@@ -193,14 +193,14 @@ func (d *Deque) PopBack() {
 	} else {
 		d.deallocateNode((*d.map_)[d.finish.node])
 		d.finish.setNode(d.finish.node - 1)
-		d.finish.cur = dequeBufSize - 1
+		d.finish.cur = DequeBufSize - 1
 	}
 	(*(*d.map_)[d.finish.node])[d.finish.cur] = nil
 }
 
 func (d *Deque) PopFront() {
 	(*(*d.map_)[d.start.node])[d.start.cur] = nil
-	if d.start.cur != dequeBufSize-1 {
+	if d.start.cur != DequeBufSize-1 {
 		d.start.cur++
 	} else {
 		d.deallocateNode((*d.map_)[d.start.node])
@@ -351,7 +351,7 @@ func (d *Deque) deafultAppend(n int) {
 }
 
 func (d *Deque) reserveElementsAtBack(n int) *DequeIter {
-	var vacancies = dequeBufSize - d.finish.cur - 1
+	var vacancies = DequeBufSize - d.finish.cur - 1
 	if n > vacancies {
 		d.newElementsAtBack(n - vacancies)
 	}
@@ -360,7 +360,7 @@ func (d *Deque) reserveElementsAtBack(n int) *DequeIter {
 
 func (d *Deque) newElementsAtBack(newElems int) {
 	// TODO: add size limit?
-	var newNodes = (newElems + dequeBufSize - 1) / dequeBufSize
+	var newNodes = (newElems + DequeBufSize - 1) / DequeBufSize
 	d.reserveMapAtBack(newNodes)
 	for i := 1; i <= newNodes; i++ {
 		(*d.map_)[d.finish.node+i] = d.allocateNode()
@@ -383,7 +383,7 @@ func (d *Deque) reserveElementsAtFront(n int) *DequeIter {
 
 func (d *Deque) newElementsAtFront(newElems int) {
 	// TODO: add size limit?
-	var newNodes = (newElems + dequeBufSize - 1) / dequeBufSize
+	var newNodes = (newElems + DequeBufSize - 1) / DequeBufSize
 	d.reserveMapAtFront(newNodes)
 	for i := 1; i <= newNodes; i++ {
 		(*d.map_)[d.start.node-i] = d.allocateNode()
@@ -509,8 +509,8 @@ type dequeImpl struct {
 }
 
 func (i *dequeImpl) initializeMap(numElements int) {
-	var numNodes = numElements/dequeBufSize + 1
-	i.mapSize = max(initialMapSize, numNodes+2)
+	var numNodes = numElements/DequeBufSize + 1
+	i.mapSize = max(InitialMapSize, numNodes+2)
 	i.map_ = i.allocateMap(i.mapSize)
 
 	var nstart = (i.mapSize - numNodes) / 2
@@ -519,7 +519,7 @@ func (i *dequeImpl) initializeMap(numElements int) {
 	i.createNodes(nstart, nfinish)
 	i.start.setNode(nstart)
 	i.finish.setNode(nfinish - 1)
-	i.finish.cur = numElements % dequeBufSize
+	i.finish.cur = numElements % DequeBufSize
 }
 
 func (i *dequeImpl) createNodes(start, finish int) {
@@ -536,7 +536,7 @@ func (i *dequeImpl) destroyNodes(start, finish int) {
 }
 
 func (i *dequeImpl) allocateNode() *node {
-	var n = make(node, dequeBufSize, dequeBufSize)
+	var n = make(node, DequeBufSize, DequeBufSize)
 	return &n
 }
 
