@@ -31,14 +31,14 @@ var dequeBufSize = DequeBufSize
 
 func TestNewDeque(t *testing.T) {
 	t.Run(`NewDeque`, func(t *testing.T) {
-		d := NewDeque()
+		d := New()
 		assert.Equal(t, 0, d.Size())
 		assert.True(t, d.Empty())
 	})
 
 	t.Run(`NewDequeN`, func(t *testing.T) {
 		test := func(elems, size int, empty bool) {
-			d := NewDequeN(elems)
+			d := NewN(elems)
 			assert.Equal(t, size, d.Size())
 			assert.Equal(t, empty, d.Empty())
 		}
@@ -56,7 +56,7 @@ func TestNewDeque(t *testing.T) {
 		}
 
 		test := func(first, last InputIter, size int, empty bool) {
-			d := NewDequeFromRange(first, last)
+			d := NewFromRange(first, last)
 			assert.Equal(t, size, d.Size())
 			assert.Equal(t, empty, d.Empty())
 		}
@@ -73,7 +73,7 @@ func TestNewDeque(t *testing.T) {
 func TestDequeMethodsBlackbox(t *testing.T) {
 	t.Run(`ResizeAssign`, func(t *testing.T) {
 		test := func(toSize, size int, empty bool) {
-			d := NewDeque()
+			d := New()
 			d.ResizeAssign(toSize, 1)
 			assert.Equal(t, size, d.Size())
 			assert.Equal(t, empty, d.Empty())
@@ -89,7 +89,7 @@ func TestDequeMethodsBlackbox(t *testing.T) {
 	})
 
 	t.Run(`ShrinkToFit`, func(t *testing.T) {
-		var d = NewDequeN(8 * dequeBufSize)
+		var d = NewN(8 * dequeBufSize)
 		d.Clear()
 		assert.Equal(t, 0, d.Size())
 		d.PushBack(1)
@@ -104,7 +104,7 @@ func TestDequeMethodsBlackbox(t *testing.T) {
 	})
 
 	t.Run(`ElementAccess`, func(t *testing.T) {
-		var d = NewDeque()
+		var d = New()
 		for i := 0; i < 10; i++ {
 			d.PushBack(i)
 		}
@@ -118,7 +118,7 @@ func TestDequeMethodsBlackbox(t *testing.T) {
 	})
 
 	t.Run(`FillAssign`, func(t *testing.T) {
-		var d = NewDeque()
+		var d = New()
 		for i := 0; i < 10; i++ {
 			d.PushBack(i)
 		}
@@ -130,7 +130,7 @@ func TestDequeMethodsBlackbox(t *testing.T) {
 	})
 
 	t.Run(`AssignRange`, func(t *testing.T) {
-		var d = NewDeque()
+		var d = New()
 		var n = 10
 		for i := 0; i < n; i++ {
 			d.PushBack(n - i)
@@ -148,7 +148,7 @@ func TestDequeMethodsBlackbox(t *testing.T) {
 	})
 
 	t.Run(`Insert`, func(t *testing.T) {
-		var d = NewDeque()
+		var d = New()
 		var it = d.Insert(d.Begin(), 1)
 		assert.True(t, it.Equal(d.Begin()))
 		assert.Equal(t, 1, d.Size())
@@ -177,7 +177,7 @@ func TestDequeMethodsBlackbox(t *testing.T) {
 
 		var newIt = func(i int) *vectorIter { return &vectorIter{i, &v} }
 
-		var d = NewDequeN(10)
+		var d = NewN(10)
 		var begin = d.Begin()
 		var pos = d.Begin()
 		pos.NextN(5)
@@ -195,7 +195,7 @@ func TestDequeMethodsBlackbox(t *testing.T) {
 	})
 
 	t.Run(`FillInsert`, func(t *testing.T) {
-		var d = NewDequeN(10)
+		var d = NewN(10)
 		var begin = d.Begin()
 		var pos = d.Begin()
 		pos.NextN(5)
@@ -213,7 +213,7 @@ func TestDequeMethodsBlackbox(t *testing.T) {
 	})
 
 	t.Run(`Erase`, func(t *testing.T) {
-		var d = NewDeque()
+		var d = New()
 		for i := 0; i < 8*dequeBufSize; i++ {
 			d.PushBack(i)
 		}
@@ -232,7 +232,7 @@ func TestDequeMethodsBlackbox(t *testing.T) {
 	})
 
 	t.Run(`EraseRange`, func(t *testing.T) {
-		var d = NewDeque()
+		var d = New()
 		for i := 0; i < 8*dequeBufSize; i++ {
 			d.PushBack(i)
 		}
@@ -258,7 +258,7 @@ func TestDequeMethodsBlackbox(t *testing.T) {
 	})
 
 	t.Run(`Clear`, func(t *testing.T) {
-		var d = NewDequeN(10000)
+		var d = NewN(10000)
 		d.Clear()
 		assert.Equal(t, 0, d.Size())
 		assert.Equal(t, d.Begin(), d.End())

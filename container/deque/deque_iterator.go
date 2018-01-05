@@ -2,32 +2,39 @@ package deque
 
 var _ RandIter = (*DequeIter)(nil)
 
-// implement a random access iterator.
+// DequeIter implement a random access iterator.
 type DequeIter struct {
 	cur  int
 	node int
 	map_ **nodeMap
 }
 
+// CanMultiPass indicates this is a forward iterator.
 func (it *DequeIter) CanMultiPass() {}
 
+// Clone returns a copy of this iterator.
 func (it *DequeIter) Clone() IterRef {
 	return &DequeIter{it.cur, it.node, it.map_}
 }
 
+// CopyAssign assgins given iterator to this iterator.
 func (it *DequeIter) CopyAssign(r IterCRef) {
 	*it = *(r.(*DequeIter))
 }
 
+// Swap swaps data with another iterator.
 func (it *DequeIter) Swap(r IterCRef) {
 	var r_ = r.(*DequeIter)
 	*it, *r_ = *r_, *it
 }
 
+// Deref is like the derefference operation (*it) in c++ to get the value at this position.
 func (it *DequeIter) Deref() Value {
 	return (*(*(*it.map_))[it.node])[it.cur]
 }
 
+// DerefSet is like the derefference operation (*it=val) in c++ to
+// set value to the element at this position.
 func (it *DequeIter) DerefSet(val Value) {
 	(*(*(*it.map_))[it.node])[it.cur] = val
 }
@@ -36,6 +43,7 @@ func (it *DequeIter) setNode(newNode int) {
 	it.node = newNode
 }
 
+// Next is like the pointer arithmetic it++ in c++ to increment the iterator.
 func (it *DequeIter) Next() {
 	it.cur++
 	if it.cur == nodeEnd {
@@ -44,6 +52,7 @@ func (it *DequeIter) Next() {
 	}
 }
 
+// Prev is like the pointer arithmetic it-- in c++ to decrement the iterator.
 func (it *DequeIter) Prev() {
 	if it.cur == 0 {
 		it.setNode(it.node - 1)
@@ -52,6 +61,7 @@ func (it *DequeIter) Prev() {
 	it.cur--
 }
 
+// NextN is like the pointer arithmetic it+=n in c++ to increment the iterator by n.
 func (it *DequeIter) NextN(n int) {
 	var offset = n + it.cur
 	if offset >= 0 && offset < DequeBufSize {
@@ -68,15 +78,18 @@ func (it *DequeIter) NextN(n int) {
 	}
 }
 
+// PrevN is like the pointer arithmetic it-=n in c++ to decrement the iterator by n.
 func (it *DequeIter) PrevN(n int) {
 	it.NextN(-n)
 }
 
+// Equal checks if given iterator is equal to this iterator.
 func (it *DequeIter) Equal(r IterCRef) bool {
 	var r_ = r.(*DequeIter)
 	return it.map_ == r_.map_ && it.node == r_.node && it.cur == r_.cur
 }
 
+// LessThan checks if this iterator is less than given iterator.
 func (it *DequeIter) LessThan(r IterCRef) bool {
 	var r_ = r.(*DequeIter)
 	return it.map_ == r_.map_ &&
@@ -84,6 +97,8 @@ func (it *DequeIter) LessThan(r IterCRef) bool {
 			it.node < r_.node)
 }
 
+// Distance counts distance between given iterator and this one.
+// 	d = r - it.
 func (it *DequeIter) Distance(r IterCRef) int {
 	var r_ = r.(*DequeIter)
 	return (r_.node-it.node)*DequeBufSize + r_.cur - it.cur
