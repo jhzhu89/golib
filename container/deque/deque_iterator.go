@@ -21,9 +21,7 @@ func (it *DequeIter) CopyAssign(r IterCRef) {
 
 func (it *DequeIter) Swap(r IterCRef) {
 	var r_ = r.(*DequeIter)
-	it.cur, r_.cur = r_.cur, it.cur
-	it.node, r_.node = r_.node, it.node
-	it.map_, r_.map_ = r_.map_, it.map_
+	*it, *r_ = *r_, *it
 }
 
 func (it *DequeIter) Deref() Value {

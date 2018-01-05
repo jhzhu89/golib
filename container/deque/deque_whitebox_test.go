@@ -279,3 +279,43 @@ func TestDequeMethodsWhitebox(t *testing.T) {
 		})
 	})
 }
+
+func TestInitializeMap(t *testing.T) {
+	var d = dequeImpl{}
+	d.start = &DequeIter{map_: &d.map_}
+	d.finish = &DequeIter{map_: &d.map_}
+
+	var test = func(elems, mapSize, startCur, startNode, finishCur, finishNode int) {
+		d.initializeMap(elems)
+		assert.NotNil(t, d.map_)
+		assert.Equal(t, mapSize, d.mapSize)
+		assert.Equal(t, startCur, d.start.cur)
+		assert.Equal(t, startNode, d.start.node)
+		assert.Equal(t, finishCur, d.finish.cur)
+		assert.Equal(t, finishNode, d.finish.node)
+	}
+
+	test(0, 8, 0, 3, 0, 3)
+	test(1, 8, 0, 3, 1, 3)
+	test(DequeBufSize, 8, 0, 3, 0, 4)
+	test(4*DequeBufSize, 8, 0, 1, 0, 5)
+	test(8*DequeBufSize, 11, 0, 1, 0, 9)
+}
+
+func TestNodesOp(t *testing.T) {
+	var d = dequeImpl{}
+	d.start = &DequeIter{map_: &d.map_}
+	d.finish = &DequeIter{map_: &d.map_}
+	d.initializeMap(4 * DequeBufSize)
+
+	d.createNodes(1, 3)
+	for i := 1; i < 3; i++ {
+		assert.NotNil(t, (*d.map_)[i])
+		assert.Equal(t, DequeBufSize, len((*(*d.map_)[i])))
+	}
+
+	d.destroyNodes(1, 3)
+	for i := 1; i < 3; i++ {
+		assert.Nil(t, (*d.map_)[i])
+	}
+}
