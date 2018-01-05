@@ -1,15 +1,13 @@
 package algorithm
 
 func Fill(first, last MForwardIter, val Value) {
-	first = first.Clone().(MForwardIter)
-	last = last.Clone().(MForwardIter)
-	for f := first; !f.Equal(last); f.Next() {
+	for f := first.Clone().(MForwardIter); !f.Equal(last); f.Next() {
 		f.DerefSet(val)
 	}
 }
 
 func Copy(first, last InputIter, result OutputIter) OutputIter {
-	first, last = first.Clone().(InputIter), last.Clone().(InputIter)
+	first = first.Clone().(InputIter)
 	result = result.Clone().(OutputIter)
 	switch first.(type) {
 	case RandIter:
@@ -31,7 +29,7 @@ func Copy(first, last InputIter, result OutputIter) OutputIter {
 }
 
 func CopyBackward(first, last BidirectIter, result MBidirectIter) MBidirectIter {
-	first, last = first.Clone().(BidirectIter), last.Clone().(BidirectIter)
+	last = last.Clone().(BidirectIter)
 	result = result.Clone().(MBidirectIter)
 
 	switch last.(type) {
