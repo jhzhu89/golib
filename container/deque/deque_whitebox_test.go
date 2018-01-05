@@ -9,7 +9,7 @@ import (
 
 func TestRellocateMap(t *testing.T) {
 	var test = func(nodesToAdd int, addAtFront bool, mapSize, startNode int) {
-		var d = NewDeque()
+		var d = New()
 		d.reallocateMap(nodesToAdd, addAtFront)
 
 		assert.Equal(t, mapSize, d.mapSize)
@@ -57,28 +57,28 @@ func TestFillInsert(t *testing.T) {
 		assert.Equal(t, numNonEmptyNodes, nonEmpty)
 	}
 
-	var d = NewDeque()
+	var d = New()
 	test(d, d.Begin(), 1, DequeBufSize-1, 2, 0, 3, 1, 2, false)
-	d = NewDeque()
+	d = New()
 	test(d, d.Begin(), DequeBufSize, 0, 2, 0, 3, DequeBufSize, 2, false)
 
-	d = NewDequeN(1)
+	d = NewN(1)
 	test(d, d.End(), 1, 0, 3, 2, 3, 2, 1, false)
-	d = NewDequeN(1)
+	d = NewN(1)
 	test(d, d.End(), DequeBufSize, 0, 3, 1, 4, DequeBufSize+1, 2, false)
 
-	d = NewDequeN(10)
+	d = NewN(10)
 	test(d, nextN(d.Begin(), 5), 1, 0, 3, 11, 3, 11, 1, false)
-	d = NewDequeN(10)
+	d = NewN(10)
 	test(d, nextN(d.Begin(), 5), DequeBufSize, 0, 3, 10, 4, DequeBufSize+10, 2, false)
 
-	d = NewDequeN(10)
+	d = NewN(10)
 	test(d, nextN(d.Begin(), 5), 8*DequeBufSize, 0, 4, 10, 12, 8*DequeBufSize+10, 9, false)
 }
 
 func TestNewElementsAt(t *testing.T) {
 	var test = func(front bool, elems, numNonEmptyNodes int) {
-		var d = NewDeque()
+		var d = New()
 		if front {
 			d.newElementsAtFront(elems)
 		} else {
@@ -108,7 +108,7 @@ func TestNewElementsAt(t *testing.T) {
 }
 
 func TestDestroyData(t *testing.T) {
-	var d = NewDequeN(2 * DequeBufSize)
+	var d = NewN(2 * DequeBufSize)
 	d.FillAssign(2*DequeBufSize, 10)
 
 	var countNonNil = func() int {
@@ -140,7 +140,7 @@ func TestEraseAt(t *testing.T) {
 	}
 
 	t.Run(`Begin`, func(t *testing.T) {
-		var d = NewDequeN(2 * DequeBufSize)
+		var d = NewN(2 * DequeBufSize)
 		d.FillAssign(2*DequeBufSize, 1)
 
 		var pos = nextN(d.Begin(), DequeBufSize-1)
@@ -154,7 +154,7 @@ func TestEraseAt(t *testing.T) {
 	})
 
 	t.Run(`End`, func(t *testing.T) {
-		var d = NewDequeN(2 * DequeBufSize)
+		var d = NewN(2 * DequeBufSize)
 		d.FillAssign(2*DequeBufSize, 1)
 
 		var pos = nextN(d.Begin(), DequeBufSize)
@@ -177,7 +177,7 @@ func TestDequeMethodsWhitebox(t *testing.T) {
 			assert.NotEqual(t, fmt.Sprintf("%x", &l), fmt.Sprintf("%x", &r))
 		}
 
-		var d = NewDeque()
+		var d = New()
 		check(d.start, d.Begin())
 		check(d.finish, d.End())
 	})
@@ -185,7 +185,7 @@ func TestDequeMethodsWhitebox(t *testing.T) {
 	t.Run(`Resize`, func(t *testing.T) {
 		test := func(toSize, numNonEmptyNodes, startCur, startNode, finishCur,
 			finishNode, size int, empty bool) {
-			d := NewDeque()
+			d := New()
 			d.Resize(toSize)
 			var nonEmpty int
 			for i := 0; i < len(*d.map_); i++ {
@@ -254,25 +254,25 @@ func TestDequeMethodsWhitebox(t *testing.T) {
 
 		t.Run(`Push`, func(t *testing.T) {
 			t.Run(`Back`, func(t *testing.T) {
-				test(NewDeque(), pushBack, 1, 0, 3, 1, 3, 1, false)
-				test(NewDequeN(DequeBufSize-1), pushBack, 2, 0, 3, 0, 4, DequeBufSize, false)
+				test(New(), pushBack, 1, 0, 3, 1, 3, 1, false)
+				test(NewN(DequeBufSize-1), pushBack, 2, 0, 3, 0, 4, DequeBufSize, false)
 			})
 
 			t.Run(`Front`, func(t *testing.T) {
-				test(NewDeque(), pushFront, 2, DequeBufSize-1, 2, 0, 3, 1, false)
+				test(New(), pushFront, 2, DequeBufSize-1, 2, 0, 3, 1, false)
 			})
 		})
 
 		t.Run(`Pop`, func(t *testing.T) {
 			t.Run(`Back`, func(t *testing.T) {
-				test(NewDequeN(1), popBack, 1, 0, 3, 0, 3, 0, true)
-				test(NewDequeN(DequeBufSize), popBack, 1, 0, 3, DequeBufSize-1, 3, DequeBufSize-1, false)
+				test(NewN(1), popBack, 1, 0, 3, 0, 3, 0, true)
+				test(NewN(DequeBufSize), popBack, 1, 0, 3, DequeBufSize-1, 3, DequeBufSize-1, false)
 			})
 
 			t.Run(`Front`, func(t *testing.T) {
-				test(NewDequeN(1), popFront, 1, 1, 3, 1, 3, 0, true)
+				test(NewN(1), popFront, 1, 1, 3, 1, 3, 0, true)
 
-				var d = NewDequeN(2 * DequeBufSize)
+				var d = NewN(2 * DequeBufSize)
 				d.eraseAtBegin(nextN(d.Begin(), DequeBufSize-1))
 				test(d, popFront, 2, 0, 3, 0, 4, DequeBufSize, false)
 			})

@@ -1,3 +1,14 @@
+// Copyright 2017-present Jiahao Zhu. All rights reserved.
+// Use of this source code is governed by a MIT license
+// that can be found in the LICENSE file.
+
+// Package deque implements a c++ STL-like deque.
+//
+// To iterate over a deque (where d is a *Deque):
+//	for it := d.Begin(); !it.Equal(d.End()); it.Next()) {
+//		val := it.Deref()
+//		// do something with val
+//	}
 package deque
 
 import (
@@ -7,27 +18,30 @@ import (
 )
 
 const (
-	DequeBufSize   = 512
-	nodeEnd        = DequeBufSize
+	// The size of underlying node which stores data.
+	DequeBufSize = 512
+	// The initial size of underlying map which holds pointers to nodes.
 	InitialMapSize = 8
+
+	nodeEnd = DequeBufSize
 )
 
+// Type aliases.
 type (
 	Value = container.Value
 
-	Iter = iterator.Iter
-
-	IterRef  = iterator.IterRef
-	IterCRef = iterator.IterCRef
-
-	InputIter = iterator.InputIter
-	RandIter  = iterator.RandIter
-
+	Iter        = iterator.Iter
+	IterRef     = iterator.IterRef
+	IterCRef    = iterator.IterCRef
+	InputIter   = iterator.InputIter
+	RandIter    = iterator.RandIter
 	ForwardIter = iterator.ForwardIter
-
 	ReverseIter = iterator.ReverseIterator
 )
 
+// Deque represents a c++ STL-like deque.
+// The zero value for Deque cannot be directly used. Call NewDeque*()
+// to get a valid Deque instance.
 type Deque struct {
 	dequeImpl
 }
@@ -39,19 +53,23 @@ func newDeque() *Deque {
 	return d
 }
 
-func NewDeque() *Deque {
+// New creates a Deque with no elements.
+func New() *Deque {
 	d := newDeque()
 	d.initializeMap(0)
 	return d
 }
 
-func NewDequeN(n int) *Deque {
+// NewN creates a Deque with n nil elements.
+func NewN(n int) *Deque {
 	d := newDeque()
 	d.initializeMap(n)
 	return d
 }
 
-func NewDequeFromRange(first, last InputIter) *Deque {
+// NewFromRange creates a Deque consisting of copies of the
+// elements from [first, last).
+func NewFromRange(first, last InputIter) *Deque {
 	d := newDeque()
 	d.rangeInitialize(first, last)
 	return d
@@ -59,28 +77,41 @@ func NewDequeFromRange(first, last InputIter) *Deque {
 
 // Iterators
 
+// Begin returns a read/write iterator that points to the first element in the
+// Deque. Iteration is done in ordinary element order.
 func (d *Deque) Begin() *DequeIter {
 	return clone(d.start)
 }
 
+// End returns a read/write iterator that points one past the last
+// element in the Deque. Iteration is done in ordinary
+// element order.
 func (d *Deque) End() *DequeIter {
 	return clone(d.finish)
 }
 
+// RBegin returns a read/write reverse iterator that points to the
+// last element in the Deque. Iteration is done in reverse
+// element order.
 func (d *Deque) RBegin() *ReverseIter {
 	return iterator.NewReverseIterator(d.finish)
 }
 
+// REnd returns a read/write reverse iterator that points to one
+// before the first element in the Deque. Iteration is done
+// in reverse element order.
 func (d *Deque) REnd() *ReverseIter {
 	return iterator.NewReverseIterator(d.start)
 }
 
 // Capacity
 
+// Size returns the number of elements in the Deque.
 func (d *Deque) Size() int {
 	return d.start.Distance(d.finish)
 }
 
+// Resize resizes the Deque to the specified number of elements.
 func (d *Deque) Resize(newSize int) {
 	var len = d.Size()
 	if newSize > len {
@@ -90,6 +121,8 @@ func (d *Deque) Resize(newSize int) {
 	}
 }
 
+// ResizeAssign resizes the Deque to the specified number of elements.
+// val is the data with which new elements should be populated.
 func (d *Deque) ResizeAssign(newSize int, val Value) {
 	var len = d.Size()
 	if newSize > len {
@@ -99,6 +132,7 @@ func (d *Deque) ResizeAssign(newSize int, val Value) {
 	}
 }
 
+// ShrinkToFit shrinks deque to reduce memory use.
 func (d *Deque) ShrinkToFit() bool {
 	var frontCapacity = d.start.cur
 	if frontCapacity == 0 {
@@ -110,27 +144,32 @@ func (d *Deque) ShrinkToFit() bool {
 		return false
 	}
 
-	var x = NewDequeN(d.Size())
+	var x = NewN(d.Size())
 	x.rangeInitialize(d.start, d.finish)
 	d.Swap(x)
 	return true
 }
 
+// Empty returns true if the Deuqe is empty.
 func (d *Deque) Empty() bool {
 	return d.start.Equal(d.finish)
 }
 
 // Element access
+
+// At accesses data contained in the Deque by subscript.
 func (d *Deque) At(n int) Value {
 	var it = d.Begin()
 	it.NextN(n)
 	return (*(*d.map_)[it.node])[it.cur]
 }
 
+// Front returns the data at the first element of the Deuqe.
 func (d *Deque) Front() Value {
 	return d.At(0)
 }
 
+// Back returns the data at the last element of the Deuqe.
 func (d *Deque) Back() Value {
 	var it = d.End()
 	it.Prev()
@@ -139,6 +178,7 @@ func (d *Deque) Back() Value {
 
 // Modifiers
 
+// FillAssign assigns a given value to a Deque.
 func (d *Deque) FillAssign(size int, val Value) {
 	if size > d.Size() {
 		algorithm.Fill(d.start, d.finish, val)
@@ -149,6 +189,7 @@ func (d *Deque) FillAssign(size int, val Value) {
 	}
 }
 
+// AssignRange assigns a range to a Deque.
 func (d *Deque) AssignRange(first, last InputIter) {
 	var size = iterator.Distance(first, last)
 	if size > d.Size() {
@@ -161,6 +202,7 @@ func (d *Deque) AssignRange(first, last InputIter) {
 	}
 }
 
+// PushBack adds data to the end of the Deque.
 func (d *Deque) PushBack(val Value) {
 	if d.finish.cur != DequeBufSize-1 {
 		(*(*d.map_)[d.finish.node])[d.finish.cur] = val
@@ -174,6 +216,7 @@ func (d *Deque) PushBack(val Value) {
 	}
 }
 
+// PushFront adds data to the front of the Deque.
 func (d *Deque) PushFront(val Value) {
 	if d.start.cur != 0 {
 		(*(*d.map_)[d.start.node])[d.start.cur-1] = val
@@ -187,6 +230,7 @@ func (d *Deque) PushFront(val Value) {
 	}
 }
 
+// PopBack removes last element.
 func (d *Deque) PopBack() {
 	if d.finish.cur != 0 {
 		d.finish.cur--
@@ -198,6 +242,7 @@ func (d *Deque) PopBack() {
 	(*(*d.map_)[d.finish.node])[d.finish.cur] = nil
 }
 
+// PopFront removes first element.
 func (d *Deque) PopFront() {
 	(*(*d.map_)[d.start.node])[d.start.cur] = nil
 	if d.start.cur != DequeBufSize-1 {
@@ -209,6 +254,7 @@ func (d *Deque) PopFront() {
 	}
 }
 
+// Insert inserts given value into Deque before specified iterator.
 func (d *Deque) Insert(pos *DequeIter, val Value) *DequeIter {
 	pos = clone(pos)
 	if pos.cur == d.start.cur {
@@ -244,6 +290,7 @@ func (i insertFunc) Insert(it Iter, val Value) Iter {
 	return i(it, val)
 }
 
+// InsertRange inserts a range into the Deque.
 func (d *Deque) InsertRange(pos *DequeIter, first, last InputIter) *DequeIter {
 	pos = clone(pos)
 	var offset = d.start.Distance(pos)
@@ -290,12 +337,14 @@ func (d *Deque) InsertRange(pos *DequeIter, first, last InputIter) *DequeIter {
 	return nextN(clone(d.start), offset)
 }
 
+//FillInsert inserts a number of copies of given data into the Deque.
 func (d *Deque) FillInsert(pos *DequeIter, n int, val Value) *DequeIter {
 	var offset = d.start.Distance(pos)
 	d.fillInsert(pos, n, val)
 	return nextN(clone(d.start), offset)
 }
 
+// Erase removes element at given position.
 func (d *Deque) Erase(pos *DequeIter) *DequeIter {
 	var next = next(clone(pos))
 	var index = d.start.Distance(pos)
@@ -311,6 +360,7 @@ func (d *Deque) Erase(pos *DequeIter) *DequeIter {
 	return nextN(clone(d.start), index)
 }
 
+// EraseRange removes a range of elements.
 func (d *Deque) EraseRange(first, last *DequeIter) *DequeIter {
 	if first.Equal(last) {
 		return first
@@ -335,6 +385,7 @@ func (d *Deque) EraseRange(first, last *DequeIter) *DequeIter {
 	}
 }
 
+// Swap swaps data with another Deque.
 func (d *Deque) Swap(x *Deque) {
 	d.start, x.start = x.start, d.start
 	d.finish, x.finish = x.finish, d.finish
@@ -342,6 +393,7 @@ func (d *Deque) Swap(x *Deque) {
 	d.mapSize, x.mapSize = x.mapSize, d.mapSize
 }
 
+// Clear erases all the elements.
 func (d *Deque) Clear() {
 	d.eraseAtEnd(d.start)
 }
