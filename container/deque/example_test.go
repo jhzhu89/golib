@@ -18,7 +18,7 @@ func Example() {
 	d.PushBack(struct{}{})
 	d.PushBack(nil)
 
-	// Iterate through list and print its contents.
+	// Iterate through deque and print its contents.
 	for it := d.Begin(); !it.Equal(d.End()); it.Next() {
 		fmt.Println(it.Deref())
 	}
