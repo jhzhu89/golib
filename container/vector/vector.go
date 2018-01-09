@@ -1,112 +1,195 @@
 package vector
 
+import (
+	"github.com/jhzhu89/golib/algorithm"
+	"github.com/jhzhu89/golib/container"
+	"github.com/jhzhu89/golib/iterator"
+)
+
+// Type aliases.
+type (
+	Value = container.Value
+
+	Iter        = iterator.Iter
+	IterRef     = iterator.IterRef
+	IterCRef    = iterator.IterCRef
+	InputIter   = iterator.InputIter
+	RandIter    = iterator.RandIter
+	ForwardIter = iterator.ForwardIter
+	ReverseIter = iterator.ReverseIterator
+)
+
 type Vector struct {
+	vectorImpl
 }
 
 // Iterators
 
-func (d *Vector) Begin() *VectorIter {
-	return nil //clone(d.start)
+func (v *Vector) Begin() *VectorIter {
+	return nil //clone(v.start)
 }
 
-func (d *Vector) End() *VectorIter {
-	return nil //clone(d.finish)
+func (v *Vector) End() *VectorIter {
+	return nil //clone(v.finish)
 }
 
-func (d *Vector) RBegin() *ReverseIter {
-	return nil //iterator.NewReverseIterator(d.finish)
+func (v *Vector) RBegin() *ReverseIter {
+	return nil //iterator.NewReverseIterator(v.finish)
 }
 
-func (d *Vector) REnd() *ReverseIter {
-	return nil //iterator.NewReverseIterator(d.start)
+func (v *Vector) REnd() *ReverseIter {
+	return nil //iterator.NewReverseIterator(v.start)
 }
 
 // Element access
 
-func (d *Vector) At(n int) Value {
+func (v *Vector) At(n int) Value {
 	return nil
 }
 
-func (d *Vector) Front() Value {
-	return d.At(0)
+func (v *Vector) Front() Value {
+	return v.At(0)
 }
 
-func (d *Vector) Back() Value {
+func (v *Vector) Back() Value {
 	return nil
 }
 
 // Capacity
 
 // Empty returns true if the Deuqe is empty.
-func (d *Vector) Empty() bool {
+func (v *Vector) Empty() bool {
 	return true
 }
 
-func (d *Vector) Size() int {
+func (v *Vector) Size() int {
 	return 0
 }
 
-func (d *Vector) MaxSize() int {
+func (v *Vector) MaxSize() int {
 	return 0
 }
 
-func (d *Vector) Reserve(newCap int) {
+func (v *Vector) Reserve(newCap int) {
+}
+
+func (v *Vector) Capacity() int {
 	return 0
 }
 
-func (d *Vector) Capacity() int {
-	return 0
-}
-
-func (d *Vector) ShrinkToFit() bool {
+func (v *Vector) ShrinkToFit() bool {
 	return false
 }
 
 // Modifiers
-func (d *Vector) Clear() {
-	return false
+func (v *Vector) Clear() {
 }
 
-func (d *Vector) Insert(pos *VectorIter, val Value) *VectorIter {
+func (v *Vector) Insert(pos *VectorIter, val Value) *VectorIter {
 	return nil
 }
 
-func (i insertFunc) Insert(it Iter, val Value) Iter {
+//func (i insertFunc) Insert(it Iter, val Value) Iter {
+//	return nil
+//}
+
+func (v *Vector) InsertRange(pos *VectorIter, first, last InputIter) *VectorIter {
 	return nil
 }
 
-func (d *Vector) InsertRange(pos *VectorIter, first, last InputIter) *VectorIter {
+func (v *Vector) FillInsert(pos *VectorIter, n int, val Value) *VectorIter {
 	return nil
 }
 
-func (d *Vector) FillInsert(pos *VectorIter, n int, val Value) *VectorIter {
+func (v *Vector) Erase(pos *VectorIter) *VectorIter {
 	return nil
 }
 
-func (d *Vector) Erase(pos *VectorIter) *VectorIter {
+func (v *Vector) EraseRange(first, last *VectorIter) *VectorIter {
 	return nil
 }
 
-func (d *Vector) EraseRange(first, last *VectorIter) *VectorIter {
-	return nil
-}
-
-func (d *Vector) Swap(x *Vector) {
+func (v *Vector) Swap(x *Vector) {
 
 }
 
-func (d *Vector) PushBack(val Value) {
+func (v *Vector) PushBack(val Value) {
 
 }
 
-func (d *Vector) PopBack(val Value) {
+func (v *Vector) PopBack(val Value) {
 
 }
 
-func (d *Vector) Resize(newSize int) {
+func (v *Vector) Resize(newSize int) {
 
 }
 
-func (d *Vector) ResizeAssign(newSize int, val Value) {
+func (v *Vector) ResizeAssign(newSize int, val Value) {
 
+}
+
+// FillAssign assigns a given value to a Deque.
+func (v *Vector) FillAssign(size int, val Value) {
+	v.fillAssign(size, val)
+}
+
+// AssignRange assigns a range to a Deque.
+func (v *Vector) AssignRange(first, last InputIter) {
+
+}
+
+func (v *Vector) fillAssign(n int, val Value) {
+	if n > v.Capacity() {
+	} else if n > v.Size() {
+		algorithm.Fill(v.start, v.endOfStorage, val)
+	} else {
+		// v.eraseAtEnd(algorithm.FillN(v.Begin(), n, val))
+	}
+}
+
+func (v *Vector) fillInitialize(n int, val Value) {
+	v.createStorage(n)
+	v.finish = algorithm.FillN(v.start, n, val)
+}
+
+func (v *Vector) rangeInitialize(first, last InputIter) {
+	switch first.(type) {
+	case ForwardIter:
+		var n = iterator.Distance(first, last)
+		v.createStorage(n)
+		var it = first.Clone().(InputIter)
+		for i := 0; i < n; i++ {
+			(*v.data)[i] = it.Deref()
+			it.Next()
+		}
+
+	default:
+		for first = first.Clone().(InputIter); !first.Equal(last); first.Next() {
+			v.PushBack(first.Deref())
+		}
+	}
+}
+
+type vec []Value
+
+// vectorImpl handles vector allocation.
+type vectorImpl struct {
+	data *vec
+
+	start, finish, endOfStorage *VectorIter
+}
+
+func (v *vectorImpl) newIter(i int) *VectorIter {
+	return &VectorIter{i, &v.data}
+}
+
+func (v *vectorImpl) allocate(n int) {
+	var vec_ = make(vec, n, n)
+	v.data = &vec_
+}
+
+func (v *vectorImpl) createStorage(n int) {
+	v.allocate(n)
+	v.start, v.finish, v.endOfStorage = v.newIter(0), v.newIter(0), v.newIter(len(*v.data))
 }
