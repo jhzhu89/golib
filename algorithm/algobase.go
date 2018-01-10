@@ -6,6 +6,16 @@ func Fill(first, last MForwardIter, val Value) {
 	}
 }
 
+func FillN(first OutputIter, n int, val Value) OutputIter {
+	first = first.Clone().(OutputIter)
+	for n > 0 {
+		first.DerefSet(val)
+		n--
+		first.Next()
+	}
+	return first
+}
+
 func Copy(first, last InputIter, result OutputIter) OutputIter {
 	first = first.Clone().(InputIter)
 	result = result.Clone().(OutputIter)

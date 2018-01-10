@@ -327,14 +327,14 @@ func (d *Deque) InsertRange(pos *DequeIter, first, last InputIter) *DequeIter {
 
 	default:
 		algorithm.Copy(first, last,
-			iterator.NewInsertIterator(
-				insertFunc(func(it Iter, val Value) Iter {
-					return d.Insert(it.(*DequeIter), val)
-				}), pos,
-			),
-		)
-	}
-	return nextN(clone(d.start), offset)
+		iterator.NewInsertIterator(
+			insertFunc(func(it Iter, val Value) Iter {
+				return d.Insert(it.(*DequeIter), val)
+			}), pos,
+		),
+	)
+}
+return nextN(clone(d.start), offset)
 }
 
 //FillInsert inserts a number of copies of given data into the Deque.

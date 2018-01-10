@@ -26,19 +26,19 @@ type Vector struct {
 // Iterators
 
 func (v *Vector) Begin() *VectorIter {
-	return nil //clone(v.start)
+	return clone(v.start)
 }
 
 func (v *Vector) End() *VectorIter {
-	return nil //clone(v.finish)
+	return clone(v.finish)
 }
 
 func (v *Vector) RBegin() *ReverseIter {
-	return nil //iterator.NewReverseIterator(v.finish)
+	return iterator.NewReverseIterator(v.finish)
 }
 
 func (v *Vector) REnd() *ReverseIter {
-	return nil //iterator.NewReverseIterator(v.start)
+	return iterator.NewReverseIterator(v.start)
 }
 
 // Element access
@@ -63,12 +63,12 @@ func (v *Vector) Empty() bool {
 }
 
 func (v *Vector) Size() int {
-	return 0
+	return v.finish.cur - v.start.cur
 }
 
-func (v *Vector) MaxSize() int {
-	return 0
-}
+//func (v *Vector) MaxSize() int {
+//	return 0
+//}
 
 func (v *Vector) Reserve(newCap int) {
 }
@@ -122,11 +122,21 @@ func (v *Vector) PopBack(val Value) {
 }
 
 func (v *Vector) Resize(newSize int) {
-
+	var len = v.Size()
+	if newSize > len {
+		v.defaultAppend(newSize - len)
+	} else if newSize < len {
+		v.eraseAtEnd(nextN(clone(v.start), newSize))
+	}
 }
 
-func (v *Vector) ResizeAssign(newSize int, val Value) {
-
+func (v *Vector) ResizeFill(newSize int, val Value) {
+	var len = v.Size()
+	if newSize > len {
+		v.fillInsert(v.End(), newSize-len, val)
+	} else if newSize < len {
+		v.eraseAtEnd(nextN(clone(v.start), newSize))
+	}
 }
 
 // FillAssign assigns a given value to a Deque.
@@ -144,13 +154,28 @@ func (v *Vector) fillAssign(n int, val Value) {
 	} else if n > v.Size() {
 		algorithm.Fill(v.start, v.endOfStorage, val)
 	} else {
-		// v.eraseAtEnd(algorithm.FillN(v.Begin(), n, val))
+		v.eraseAtEnd(algorithm.FillN(v.Begin(), n, val).(*VectorIter))
+	}
+}
+
+func (v *Vector) fillInsert(pos *VectorIter, n int, val Value) {
+	if n != 0 {
+		if v.endOfStorage.cur-v.finish.cur >= n {
+			var elemsAfter = pos.Distance(v.finish)
+			var oldFinish = clone(v.finish)
+			if elemsAfter > n {
+
+			} else {
+
+			}
+		} else {
+		}
 	}
 }
 
 func (v *Vector) fillInitialize(n int, val Value) {
 	v.createStorage(n)
-	v.finish = algorithm.FillN(v.start, n, val)
+	v.finish = algorithm.FillN(v.start, n, val).(*VectorIter)
 }
 
 func (v *Vector) rangeInitialize(first, last InputIter) {
@@ -169,6 +194,12 @@ func (v *Vector) rangeInitialize(first, last InputIter) {
 			v.PushBack(first.Deref())
 		}
 	}
+}
+
+func (v *Vector) defaultAppend(n int) {
+}
+
+func (v *Vector) eraseAtEnd(it *VectorIter) {
 }
 
 type vec []Value
