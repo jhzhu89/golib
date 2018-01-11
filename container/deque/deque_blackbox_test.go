@@ -55,10 +55,10 @@ func TestNewDeque(t *testing.T) {
 }
 
 func TestDequeMethodsBlackbox(t *testing.T) {
-	t.Run(`ResizeAssign`, func(t *testing.T) {
+	t.Run(`ResizeFill`, func(t *testing.T) {
 		test := func(toSize, size int, empty bool) {
 			d := New()
-			d.ResizeAssign(toSize, 1)
+			d.ResizeFill(toSize, 1)
 			assert.Equal(t, size, d.Size())
 			assert.Equal(t, empty, d.Empty())
 

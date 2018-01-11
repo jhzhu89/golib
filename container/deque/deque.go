@@ -122,9 +122,9 @@ func (d *Deque) Resize(newSize int) {
 	}
 }
 
-// ResizeAssign resizes the Deque to the specified number of elements.
+// ResizeFill resizes the Deque to the specified number of elements.
 // val is the data with which new elements should be populated.
-func (d *Deque) ResizeAssign(newSize int, val Value) {
+func (d *Deque) ResizeFill(newSize int, val Value) {
 	var len = d.Size()
 	if newSize > len {
 		d.FillInsert(d.finish, newSize-len, val)
