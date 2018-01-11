@@ -55,10 +55,10 @@ func TestNewDeque(t *testing.T) {
 }
 
 func TestDequeMethodsBlackbox(t *testing.T) {
-	t.Run(`ResizeFill`, func(t *testing.T) {
+	t.Run(`FillResize`, func(t *testing.T) {
 		test := func(toSize, size int, empty bool) {
 			d := New()
-			d.ResizeFill(toSize, 1)
+			d.FillResize(toSize, 1)
 			assert.Equal(t, size, d.Size())
 			assert.Equal(t, empty, d.Empty())
 
@@ -113,7 +113,7 @@ func TestDequeMethodsBlackbox(t *testing.T) {
 		}
 	})
 
-	t.Run(`AssignRange`, func(t *testing.T) {
+	t.Run(`RangeAssign`, func(t *testing.T) {
 		var d = New()
 		var n = 10
 		for i := 0; i < n; i++ {
@@ -125,7 +125,7 @@ func TestDequeMethodsBlackbox(t *testing.T) {
 			v = append(v, i)
 		}
 
-		d.AssignRange(vec.NewIt(0, &v), vec.NewIt(dequeBufSize, &v))
+		d.RangeAssign(vec.NewIt(0, &v), vec.NewIt(dequeBufSize, &v))
 		for i := 0; i < dequeBufSize; i++ {
 			assert.Equal(t, i, d.At(i))
 		}
@@ -153,7 +153,7 @@ func TestDequeMethodsBlackbox(t *testing.T) {
 		}
 	})
 
-	t.Run(`InsertRange`, func(t *testing.T) {
+	t.Run(`RangeInsert`, func(t *testing.T) {
 		var v = make(Vec, 0, 8*dequeBufSize)
 		for i := 0; i < 8*dequeBufSize; i++ {
 			v = append(v, i)
@@ -166,7 +166,7 @@ func TestDequeMethodsBlackbox(t *testing.T) {
 		var pos = d.Begin()
 		pos.NextN(5)
 
-		var newPos = d.InsertRange(pos, newIt(0), newIt(8*dequeBufSize))
+		var newPos = d.RangeInsert(pos, newIt(0), newIt(8*dequeBufSize))
 		assert.Equal(t, begin.Distance(pos), d.Begin().Distance(newPos))
 
 		for i := 0; i < 8*dequeBufSize; i++ {
@@ -215,7 +215,7 @@ func TestDequeMethodsBlackbox(t *testing.T) {
 		}
 	})
 
-	t.Run(`EraseRange`, func(t *testing.T) {
+	t.Run(`RangeErase`, func(t *testing.T) {
 		var d = New()
 		for i := 0; i < 8*dequeBufSize; i++ {
 			d.PushBack(i)
@@ -227,7 +227,7 @@ func TestDequeMethodsBlackbox(t *testing.T) {
 		last.NextN(3 * dequeBufSize)
 		var distance = d.Begin().Distance(first)
 
-		var newPos = d.EraseRange(first, last)
+		var newPos = d.RangeErase(first, last)
 
 		assert.Equal(t, distance, d.Begin().Distance(newPos))
 		assert.Equal(t, 7*dequeBufSize, d.Size())

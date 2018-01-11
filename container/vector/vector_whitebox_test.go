@@ -1,6 +1,7 @@
 package vector
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/jhzhu89/golib/container/testutil/vec"
@@ -25,9 +26,9 @@ func TestNew(t *testing.T) {
 		assert.Equal(t, n, v.endOfStorage.cur)
 	})
 
-	t.Run(`NewNValue`, func(t *testing.T) {
+	t.Run(`NewNValues`, func(t *testing.T) {
 		var n = 512
-		var v = NewNValue(512, 1)
+		var v = NewNValues(512, 1)
 		assert.NotNil(t, v.data)
 		assert.Equal(t, n, len(*v.data))
 		assert.Equal(t, n, v.finish.cur)
@@ -50,6 +51,92 @@ func TestNew(t *testing.T) {
 		assert.Equal(t, n, v.finish.cur)
 		assert.Equal(t, n, v.endOfStorage.cur)
 	})
+}
+
+func TestReserve(t *testing.T) {
+	var v = New()
+	var n = 512
+	v.Reserve(n)
+	assert.Equal(t, 0, v.Size())
+	assert.Equal(t, n, v.Capacity())
+	assert.Equal(t, 0, v.finish.cur)
+	assert.Equal(t, n, v.endOfStorage.cur)
+}
+
+func TestShrinkToFit(t *testing.T) {
+	var v = New()
+	var n = 512
+	v.Reserve(n)
+	v.PushBack(1)
+	assert.True(t, v.ShrinkToFit())
+	assert.Equal(t, 1, v.Size())
+	assert.Equal(t, 1, v.Capacity())
+	assert.Equal(t, 1, v.finish.cur)
+	assert.Equal(t, 1, v.endOfStorage.cur)
+}
+
+func TestInsert(t *testing.T) {
+	var n = 512
+	var v = NewN(n)
+	var pos1 = v.Insert(nextN(v.Begin(), n/2), 1)
+	assert.Equal(t, n+1, v.Size())
+	assert.Equal(t, n*2, v.Capacity())
+	assert.Equal(t, n/2, pos1.cur)
+
+	var pos2 = v.Insert(v.Begin(), 1)
+	assert.Equal(t, n+2, v.Size())
+	assert.Equal(t, n*2, v.Capacity())
+	assert.Equal(t, 0, pos2.cur)
+
+	assert.NotEqual(t, fmt.Sprintf("%p", pos1), fmt.Sprintf("%p", pos2))
+
+	var pos3 = v.Insert(v.End(), 1)
+	assert.Equal(t, n+3, v.Size())
+	assert.Equal(t, n*2, v.Capacity())
+	assert.Equal(t, n+2, pos3.cur)
+
+	for i := 0; i < n+3; i++ {
+		if i == 0 || i == n+2 || i == n/2+1 {
+			assert.Equal(t, 1, v.At(i))
+		} else {
+			assert.Nil(t, v.At(i))
+		}
+	}
+}
+
+func TestRangeInsert(t *testing.T) {
+	var n = 512
+	var tv = make(vec.Vec, 0, n/2)
+	for i := 0; i < n/2; i++ {
+		tv = append(tv, i)
+	}
+	var first, last = vec.NewIt(0, &tv), vec.NewIt(n/2, &tv)
+
+	var v = NewN(n)
+	var pos1 = v.RangeInsert(nextN(v.Begin(), n/2), first, last)
+	assert.Equal(t, n+n/2, v.Size())
+	assert.Equal(t, n*2, v.Capacity())
+	assert.Equal(t, n/2, pos1.cur)
+
+	var pos2 = v.RangeInsert(v.Begin(), first, last)
+	assert.Equal(t, n*2, v.Size())
+	assert.Equal(t, n*2, v.Capacity())
+	assert.Equal(t, 0, pos2.cur)
+
+	assert.NotEqual(t, fmt.Sprintf("%p", pos1), fmt.Sprintf("%p", pos2))
+
+	var pos3 = v.RangeInsert(v.End(), first, last)
+	assert.Equal(t, n*2+n/2, v.Size())
+	assert.Equal(t, n*4, v.Capacity())
+	assert.Equal(t, n*2, pos3.cur)
+
+	for i := 0; i < n*2+n/2; i++ {
+		if i < n/2 || (n <= i && i < n+n/2) || n*2 <= i {
+			assert.Equal(t, i%(n/2), v.At(i))
+		} else {
+			assert.Nil(t, v.At(i))
+		}
+	}
 }
 
 func TestFillAssign(t *testing.T) {
@@ -126,30 +213,6 @@ func TestFillInitialize(t *testing.T) {
 	}
 }
 
-func TestRangeInsert(t *testing.T) {
-	var n1 = 512
-	var tv = make(vec.Vec, 0, n1)
-	for i := 0; i < n1; i++ {
-		tv = append(tv, i)
-	}
-
-	var n2 = 10
-	var v = NewN(n2)
-	var pos = nextN(v.Begin(), n2/2)
-	v.rangeInsert(pos, vec.NewIt(0, &tv), vec.NewIt(n1, &tv))
-	assert.Equal(t, n1+n2, len(*v.data))
-	assert.Equal(t, n1+n2, v.finish.cur)
-	assert.Equal(t, n1+n2, v.endOfStorage.cur)
-
-	for i := 0; i < n1+n2; i++ {
-		if i < n2/2 || i >= n1+n2/2 {
-			assert.Nil(t, v.At(i))
-		} else {
-			assert.Equal(t, i-n2/2, v.At(i))
-		}
-	}
-}
-
 func TestInsertAux(t *testing.T) {
 	var n = 512
 	var v = NewN(n)
@@ -186,7 +249,7 @@ func TestDefaultAppend(t *testing.T) {
 
 func TestEraseAtEnd(t *testing.T) {
 	var n, val = 512, 1
-	var v = NewNValue(n, val)
+	var v = NewNValues(n, val)
 	var pos = nextN(v.Begin(), n/2)
 
 	v.eraseAtEnd(pos)
@@ -239,7 +302,7 @@ func TestEraseRange(t *testing.T) {
 	}
 
 	var test = func(first, last *VectorIter, vals []int) {
-		v.EraseRange(first, last)
+		v.RangeErase(first, last)
 		assert.Equal(t, len(vals), v.Size())
 		for i, n := range vals {
 			assert.Equal(t, n, v.At(i))

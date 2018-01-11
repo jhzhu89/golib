@@ -11,7 +11,6 @@ import (
 type (
 	Value = container.Value
 
-	Iter        = iterator.Iter
 	IterRef     = iterator.IterRef
 	IterCRef    = iterator.IterCRef
 	InputIter   = iterator.InputIter
@@ -37,7 +36,7 @@ func NewN(n int) *Vector {
 	return v
 }
 
-func NewNValue(n int, val Value) *Vector {
+func NewNValues(n int, val Value) *Vector {
 	v := &Vector{}
 	v.createStorage(n)
 	v.fillInitialize(n, val)
@@ -131,7 +130,7 @@ func (v *Vector) Insert(pos *VectorIter, val Value) *VectorIter {
 	return nextN(clone(v.start), n)
 }
 
-func (v *Vector) InsertRange(pos *VectorIter, first, last InputIter) *VectorIter {
+func (v *Vector) RangeInsert(pos *VectorIter, first, last InputIter) *VectorIter {
 	v.rangeInsert(pos, first, last)
 	return clone(pos)
 }
@@ -145,8 +144,8 @@ func (v *Vector) Erase(pos *VectorIter) *VectorIter {
 	return v.erase(pos)
 }
 
-func (v *Vector) EraseRange(first, last *VectorIter) *VectorIter {
-	return v.eraseRange(first, last)
+func (v *Vector) RangeErase(first, last *VectorIter) *VectorIter {
+	return v.rangeErase(first, last)
 }
 
 func (v *Vector) Swap(x *Vector) {
@@ -178,7 +177,7 @@ func (v *Vector) Resize(newSize int) {
 	}
 }
 
-func (v *Vector) ResizeFill(newSize int, val Value) {
+func (v *Vector) FillResize(newSize int, val Value) {
 	var len = v.Size()
 	if newSize > len {
 		v.fillInsert(v.End(), newSize-len, val)
@@ -192,8 +191,8 @@ func (v *Vector) FillAssign(size int, val Value) {
 	v.fillAssign(size, val)
 }
 
-// AssignRange assigns a range to a Deque.
-func (v *Vector) AssignRange(first, last InputIter) {
+// RangeAssign assigns a range to a Deque.
+func (v *Vector) RangeAssign(first, last InputIter) {
 	v.assignAux(first, last)
 }
 
@@ -294,7 +293,7 @@ func (v *Vector) erase(pos *VectorIter) *VectorIter {
 	return clone(pos)
 }
 
-func (v *Vector) eraseRange(first, last *VectorIter) *VectorIter {
+func (v *Vector) rangeErase(first, last *VectorIter) *VectorIter {
 	if !first.Equal(last) {
 		if !last.Equal(v.finish) {
 			algorithm.Copy(last, v.finish, first)

@@ -122,9 +122,9 @@ func (d *Deque) Resize(newSize int) {
 	}
 }
 
-// ResizeFill resizes the Deque to the specified number of elements.
+// FillResize resizes the Deque to the specified number of elements.
 // val is the data with which new elements should be populated.
-func (d *Deque) ResizeFill(newSize int, val Value) {
+func (d *Deque) FillResize(newSize int, val Value) {
 	var len = d.Size()
 	if newSize > len {
 		d.FillInsert(d.finish, newSize-len, val)
@@ -190,14 +190,14 @@ func (d *Deque) FillAssign(size int, val Value) {
 	}
 }
 
-// AssignRange assigns a range to a Deque.
-func (d *Deque) AssignRange(first, last InputIter) {
+// RangeAssign assigns a range to a Deque.
+func (d *Deque) RangeAssign(first, last InputIter) {
 	var size = iterator.Distance(first, last)
 	if size > d.Size() {
 		var mid = first.Clone().(InputIter)
 		iterator.Advance(mid, d.Size())
 		algorithm.Copy(first, mid, d.start)
-		d.InsertRange(d.finish, mid, last)
+		d.RangeInsert(d.finish, mid, last)
 	} else {
 		d.eraseAtEnd(algorithm.Copy(first, last, d.start).(*DequeIter))
 	}
@@ -291,8 +291,8 @@ func (i insertFunc) Insert(it Iter, val Value) Iter {
 	return i(it, val)
 }
 
-// InsertRange inserts a range into the Deque.
-func (d *Deque) InsertRange(pos *DequeIter, first, last InputIter) *DequeIter {
+// RangeInsert inserts a range into the Deque.
+func (d *Deque) RangeInsert(pos *DequeIter, first, last InputIter) *DequeIter {
 	pos = clone(pos)
 	var offset = d.start.Distance(pos)
 
@@ -361,8 +361,8 @@ func (d *Deque) Erase(pos *DequeIter) *DequeIter {
 	return nextN(clone(d.start), index)
 }
 
-// EraseRange removes a range of elements.
-func (d *Deque) EraseRange(first, last *DequeIter) *DequeIter {
+// RangeErase removes a range of elements.
+func (d *Deque) RangeErase(first, last *DequeIter) *DequeIter {
 	if first.Equal(last) {
 		return first
 	} else if first.Equal(d.start) && last.Equal(d.finish) {
