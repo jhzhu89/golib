@@ -15,6 +15,7 @@ import (
 	"github.com/jhzhu89/golib/algorithm"
 	"github.com/jhzhu89/golib/container"
 	"github.com/jhzhu89/golib/iterator"
+	"github.com/jhzhu89/golib/util"
 )
 
 const (
@@ -327,14 +328,14 @@ func (d *Deque) InsertRange(pos *DequeIter, first, last InputIter) *DequeIter {
 
 	default:
 		algorithm.Copy(first, last,
-		iterator.NewInsertIterator(
-			insertFunc(func(it Iter, val Value) Iter {
-				return d.Insert(it.(*DequeIter), val)
-			}), pos,
-		),
-	)
-}
-return nextN(clone(d.start), offset)
+			iterator.NewInsertIterator(
+				insertFunc(func(it Iter, val Value) Iter {
+					return d.Insert(it.(*DequeIter), val)
+				}), pos,
+			),
+		)
+	}
+	return nextN(clone(d.start), offset)
 }
 
 //FillInsert inserts a number of copies of given data into the Deque.
@@ -462,7 +463,7 @@ func (d *Deque) reallocateMap(nodesToAdd int, addAtFront bool) {
 		}
 		copy((*d.map_)[newStart:], (*d.map_)[d.start.node:d.finish.node+1])
 	} else {
-		var newMapSize = d.mapSize + max(d.mapSize, nodesToAdd) + 2
+		var newMapSize = d.mapSize + util.Max(d.mapSize, nodesToAdd) + 2
 		var newMap = d.allocateMap(newMapSize)
 		newStart = (newMapSize - newNumNodes) / 2
 		if addAtFront {
@@ -565,7 +566,7 @@ type dequeImpl struct {
 
 func (i *dequeImpl) initializeMap(numElements int) {
 	var numNodes = numElements/DequeBufSize + 1
-	i.mapSize = max(InitialMapSize, numNodes+2)
+	i.mapSize = util.Max(InitialMapSize, numNodes+2)
 	i.map_ = i.allocateMap(i.mapSize)
 
 	var nstart = (i.mapSize - numNodes) / 2

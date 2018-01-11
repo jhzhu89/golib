@@ -105,12 +105,6 @@ func (it *DequeIter) Distance(r IterCRef) int {
 }
 
 // util funcs
-func max(a, b int) int {
-	if a >= b {
-		return a
-	}
-	return b
-}
 
 func nextN(it *DequeIter, n int) *DequeIter {
 	it.NextN(n)

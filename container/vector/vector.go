@@ -4,6 +4,7 @@ import (
 	"github.com/jhzhu89/golib/algorithm"
 	"github.com/jhzhu89/golib/container"
 	"github.com/jhzhu89/golib/iterator"
+	"github.com/jhzhu89/golib/util"
 )
 
 // Type aliases.
@@ -267,7 +268,7 @@ func (v *Vector) rangeInsert(pos *VectorIter, first, last InputIter) {
 }
 
 func (v *Vector) checkLen(n int) int {
-	return v.Size() + max(v.Size(), n)
+	return v.Size() + util.Max(v.Size(), n)
 }
 
 func (v *Vector) insertAux(pos *VectorIter, val Value) {
@@ -372,11 +373,4 @@ func (v *vectorImpl) destroyData(pos *VectorIter) {
 func (v *vectorImpl) createStorage(n int) {
 	v.allocate(n)
 	v.start, v.finish, v.endOfStorage = v.newIter(0), v.newIter(0), v.newIter(n)
-}
-
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
 }
