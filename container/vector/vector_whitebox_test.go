@@ -3,6 +3,7 @@ package vector
 import (
 	"testing"
 
+	"github.com/jhzhu89/golib/container/testutil/vec"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -24,15 +25,6 @@ func TestNew(t *testing.T) {
 		assert.Equal(t, n, v.endOfStorage.cur)
 	})
 
-	t.Run(`NewN`, func(t *testing.T) {
-		var n = 512
-		var v = NewN(512)
-		assert.NotNil(t, v.data)
-		assert.Equal(t, n, len(*v.data))
-		assert.Equal(t, n, v.finish.cur)
-		assert.Equal(t, n, v.endOfStorage.cur)
-	})
-
 	t.Run(`NewNValue`, func(t *testing.T) {
 		var n = 512
 		var v = NewNValue(512, 1)
@@ -43,6 +35,20 @@ func TestNew(t *testing.T) {
 		for i := 0; i < n; i++ {
 			assert.Equal(t, 1, v.At(i))
 		}
+	})
+
+	t.Run(`NewFromRange`, func(t *testing.T) {
+		var n = 512
+		var tv = make(vec.Vec, 0, n)
+		for i := 0; i < n; i++ {
+			tv = append(tv, i)
+		}
+
+		var v = NewFromRange(vec.NewIt(0, &tv), vec.NewIt(n, &tv))
+		assert.NotNil(t, v.data)
+		assert.Equal(t, n, len(*v.data))
+		assert.Equal(t, n, v.finish.cur)
+		assert.Equal(t, n, v.endOfStorage.cur)
 	})
 }
 
@@ -120,12 +126,28 @@ func TestFillInitialize(t *testing.T) {
 	}
 }
 
-func TestRangeInitialize(t *testing.T) {
-	t.Error("TODO")
-}
-
 func TestRangeInsert(t *testing.T) {
-	t.Error("TODO")
+	var n1 = 512
+	var tv = make(vec.Vec, 0, n1)
+	for i := 0; i < n1; i++ {
+		tv = append(tv, i)
+	}
+
+	var n2 = 10
+	var v = NewN(n2)
+	var pos = nextN(v.Begin(), n2/2)
+	v.rangeInsert(pos, vec.NewIt(0, &tv), vec.NewIt(n1, &tv))
+	assert.Equal(t, n1+n2, len(*v.data))
+	assert.Equal(t, n1+n2, v.finish.cur)
+	assert.Equal(t, n1+n2, v.endOfStorage.cur)
+
+	for i := 0; i < n1+n2; i++ {
+		if i < n2/2 || i >= n1+n2/2 {
+			assert.Nil(t, v.At(i))
+		} else {
+			assert.Equal(t, i-n2/2, v.At(i))
+		}
+	}
 }
 
 func TestInsertAux(t *testing.T) {
@@ -230,5 +252,30 @@ func TestEraseRange(t *testing.T) {
 }
 
 func TestAssignAux(t *testing.T) {
-	t.Error("TODO")
+	var n = 512
+	var tv = make(vec.Vec, 0, n)
+	for i := 0; i < n; i++ {
+		tv = append(tv, i)
+	}
+
+	var v = New()
+	for i := 0; i < n/2; i++ {
+		v.PushBack(n - i)
+	}
+
+	v.assignAux(vec.NewIt(0, &tv), vec.NewIt(n, &tv))
+
+	for i := 0; i < n; i++ {
+		assert.Equal(t, i, v.At(i))
+	}
+
+	v.assignAux(vec.NewIt(0, &tv), vec.NewIt(1, &tv))
+	assert.Equal(t, 1, v.Size())
+	for i := 0; i < n; i++ {
+		if i < 1 {
+			assert.Equal(t, i, v.At(i))
+		} else {
+			assert.Nil(t, v.At(i))
+		}
+	}
 }

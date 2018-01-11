@@ -4,7 +4,7 @@ var _ RandIter = (*VectorIter)(nil)
 
 type VectorIter struct {
 	cur  int
-	data **vec
+	data **node
 }
 
 // CanMultiPass indicates this is a forward iterator.

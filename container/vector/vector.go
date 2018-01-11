@@ -45,8 +45,7 @@ func NewNValue(n int, val Value) *Vector {
 }
 
 func NewFromRange(first, last InputIter) *Vector {
-	v := &Vector{}
-	v.createStorage(0)
+	v := New()
 	v.rangeInitialize(first, last)
 	return v
 }
@@ -108,8 +107,7 @@ func (v *Vector) ShrinkToFit() bool {
 	if v.Capacity() == v.Size() {
 		return false
 	}
-	var x = NewN(v.Size())
-	x.rangeInitialize(v.start, v.finish)
+	var x = NewFromRange(v.start, v.finish)
 	v.Swap(x)
 	return true
 }
@@ -230,14 +228,8 @@ func (v *Vector) rangeInitialize(first, last InputIter) {
 	switch first.(type) {
 	case ForwardIter:
 		var n = iterator.Distance(first, last)
-		if n > v.Size() {
-			v.extend(n - v.Size())
-		}
-		var it = first.Clone().(InputIter)
-		for i := 0; i < n; i++ {
-			(*v.data)[i] = it.Deref()
-			it.Next()
-		}
+		v.extend(n - v.Size())
+		v.finish = algorithm.Copy(first, last, v.start).(*VectorIter)
 
 	default:
 		for first = first.Clone().(InputIter); !first.Equal(last); first.Next() {
@@ -341,11 +333,11 @@ func (v *Vector) assignAux(first, last InputIter) {
 	}
 }
 
-type vec []Value
+type node []Value
 
 // vectorImpl handles vector allocation.
 type vectorImpl struct {
-	data *vec
+	data *node
 
 	start, finish, endOfStorage *VectorIter
 }
@@ -355,12 +347,12 @@ func (v *vectorImpl) newIter(i int) *VectorIter {
 }
 
 func (v *vectorImpl) allocate(n int) {
-	var vec_ = make(vec, n, n)
-	v.data = &vec_
+	var node_ = make(node, n, n)
+	v.data = &node_
 }
 
 func (v *vectorImpl) extend(n int) {
-	*v.data = append(*v.data, make(vec, n, n)...)
+	*v.data = append(*v.data, make(node, n, n)...)
 	v.endOfStorage.cur = len(*v.data)
 }
 
