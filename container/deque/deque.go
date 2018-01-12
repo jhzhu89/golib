@@ -81,14 +81,14 @@ func NewFromRange(first, last InputIter) *Deque {
 // Begin returns a read/write iterator that points to the first element in the
 // Deque. Iteration is done in ordinary element order.
 func (d *Deque) Begin() *DequeIter {
-	return clone(d.start)
+	return Clone(d.start)
 }
 
 // End returns a read/write iterator that points one past the last
 // element in the Deque. Iteration is done in ordinary
 // element order.
 func (d *Deque) End() *DequeIter {
-	return clone(d.finish)
+	return Clone(d.finish)
 }
 
 // RBegin returns a read/write reverse iterator that points to the
@@ -118,7 +118,7 @@ func (d *Deque) Resize(newSize int) {
 	if newSize > len {
 		d.deafultAppend(newSize - len)
 	} else if newSize < len {
-		d.eraseAtEnd(nextN(d.Begin(), newSize))
+		d.eraseAtEnd(NextN(d.Begin(), newSize))
 	}
 }
 
@@ -129,7 +129,7 @@ func (d *Deque) FillResize(newSize int, val Value) {
 	if newSize > len {
 		d.FillInsert(d.finish, newSize-len, val)
 	} else if newSize < len {
-		d.eraseAtEnd(nextN(d.Begin(), newSize))
+		d.eraseAtEnd(NextN(d.Begin(), newSize))
 	}
 }
 
@@ -185,7 +185,7 @@ func (d *Deque) FillAssign(size int, val Value) {
 		algorithm.Fill(d.start, d.finish, val)
 		d.FillInsert(d.finish, size-d.Size(), val)
 	} else {
-		d.eraseAtEnd(nextN(clone(d.start), size))
+		d.eraseAtEnd(NextN(Clone(d.start), size))
 		algorithm.Fill(d.start, d.finish, val)
 	}
 }
@@ -257,27 +257,27 @@ func (d *Deque) PopFront() {
 
 // Insert inserts given value into Deque before specified iterator.
 func (d *Deque) Insert(pos *DequeIter, val Value) *DequeIter {
-	pos = clone(pos)
+	pos = Clone(pos)
 	if pos.cur == d.start.cur {
 		d.PushFront(val)
 		return d.Begin()
 	} else if pos.cur == d.finish.cur {
 		d.PushBack(val)
-		return prev(d.End())
+		return Prev(d.End())
 	} else {
 		var index = d.start.Distance(pos)
 		if index < d.Size()/2 {
 			d.PushFront(d.Front())
-			var front1 = next(d.Begin())
-			var front2 = next(clone(front1))
-			pos = nextN(d.Begin(), index)
-			var pos1 = next(clone(pos))
+			var front1 = Next(d.Begin())
+			var front2 = Next(Clone(front1))
+			pos = NextN(d.Begin(), index)
+			var pos1 = Next(Clone(pos))
 			algorithm.Copy(front2, pos1, front1)
 		} else {
 			d.PushBack(d.Back())
-			var back1 = prev(d.End())
-			var back2 = prev(clone(back1))
-			pos = nextN(d.Begin(), index)
+			var back1 = Prev(d.End())
+			var back2 = Prev(Clone(back1))
+			pos = NextN(d.Begin(), index)
 			algorithm.CopyBackward(pos, back2, back1)
 		}
 		(*(*d.map_)[pos.node])[pos.cur] = val
@@ -293,7 +293,7 @@ func (i insertFunc) Insert(it Iter, val Value) Iter {
 
 // RangeInsert inserts a range into the Deque.
 func (d *Deque) RangeInsert(pos *DequeIter, first, last InputIter) *DequeIter {
-	pos = clone(pos)
+	pos = Clone(pos)
 	var offset = d.start.Distance(pos)
 
 	switch first.(type) {
@@ -312,14 +312,14 @@ func (d *Deque) RangeInsert(pos *DequeIter, first, last InputIter) *DequeIter {
 			var len = d.Size()
 			if elemsBefore < len/2 {
 				var newStart = d.reserveElementsAtFront(n)
-				pos = nextN(clone(d.start), elemsBefore)
+				pos = NextN(Clone(d.start), elemsBefore)
 				algorithm.Copy(d.start, pos, newStart)
 				d.start = newStart
-				algorithm.Copy(first, last, prevN(clone(pos), n))
+				algorithm.Copy(first, last, PrevN(Clone(pos), n))
 			} else {
 				var newFinish = d.reserveElementsAtBack(n)
 				var elemsAfter = len - elemsBefore
-				pos = prevN(clone(d.finish), elemsAfter)
+				pos = PrevN(Clone(d.finish), elemsAfter)
 				algorithm.CopyBackward(pos, d.finish, newFinish)
 				d.finish = newFinish
 				algorithm.Copy(first, last, pos)
@@ -335,19 +335,19 @@ func (d *Deque) RangeInsert(pos *DequeIter, first, last InputIter) *DequeIter {
 			),
 		)
 	}
-	return nextN(clone(d.start), offset)
+	return NextN(Clone(d.start), offset)
 }
 
 //FillInsert inserts a number of copies of given data into the Deque.
 func (d *Deque) FillInsert(pos *DequeIter, n int, val Value) *DequeIter {
 	var offset = d.start.Distance(pos)
 	d.fillInsert(pos, n, val)
-	return nextN(clone(d.start), offset)
+	return NextN(Clone(d.start), offset)
 }
 
 // Erase removes element at given position.
 func (d *Deque) Erase(pos *DequeIter) *DequeIter {
-	var next = next(clone(pos))
+	var next = Next(Clone(pos))
 	var index = d.start.Distance(pos)
 	if index < d.Size()>>1 {
 		algorithm.CopyBackward(d.start, pos, next)
@@ -358,7 +358,7 @@ func (d *Deque) Erase(pos *DequeIter) *DequeIter {
 		}
 		d.PopBack()
 	}
-	return nextN(clone(d.start), index)
+	return NextN(Clone(d.start), index)
 }
 
 // RangeErase removes a range of elements.
@@ -375,14 +375,14 @@ func (d *Deque) RangeErase(first, last *DequeIter) *DequeIter {
 			if !first.Equal(d.start) {
 				algorithm.CopyBackward(d.start, first, last)
 			}
-			d.eraseAtBegin(nextN(clone(d.start), n))
+			d.eraseAtBegin(NextN(Clone(d.start), n))
 		} else {
 			if !last.Equal(d.finish) {
 				algorithm.Copy(last, d.finish, first)
 			}
-			d.eraseAtEnd(prevN(clone(d.finish), n))
+			d.eraseAtEnd(PrevN(Clone(d.finish), n))
 		}
-		return nextN(clone(d.start), elemsBefore)
+		return NextN(Clone(d.start), elemsBefore)
 	}
 }
 
@@ -410,7 +410,7 @@ func (d *Deque) reserveElementsAtBack(n int) *DequeIter {
 	if n > vacancies {
 		d.newElementsAtBack(n - vacancies)
 	}
-	return nextN(clone(d.finish), n)
+	return NextN(Clone(d.finish), n)
 }
 
 func (d *Deque) newElementsAtBack(newElems int) {
@@ -433,7 +433,7 @@ func (d *Deque) reserveElementsAtFront(n int) *DequeIter {
 	if n > vacancies {
 		d.newElementsAtFront(n - vacancies)
 	}
-	return prevN(clone(d.start), n)
+	return PrevN(Clone(d.start), n)
 }
 
 func (d *Deque) newElementsAtFront(newElems int) {
@@ -481,13 +481,13 @@ func (d *Deque) reallocateMap(nodesToAdd int, addAtFront bool) {
 func (d *Deque) eraseAtEnd(pos *DequeIter) {
 	d.destroyData(pos, d.finish)
 	d.destroyNodes(pos.node+1, d.finish.node+1)
-	d.finish = clone(pos)
+	d.finish = Clone(pos)
 }
 
 func (d *Deque) eraseAtBegin(pos *DequeIter) {
 	d.destroyData(d.start, pos)
 	d.destroyNodes(d.start.node, pos.node)
-	d.start = clone(pos)
+	d.start = Clone(pos)
 }
 
 func (d *Deque) destroyData(first, last *DequeIter) {
@@ -510,7 +510,7 @@ func (d *Deque) destroyData(first, last *DequeIter) {
 }
 
 func (d *Deque) fillInsert(pos *DequeIter, n int, val Value) {
-	pos = clone(pos)
+	pos = Clone(pos)
 	if pos.cur == d.start.cur {
 		var newStart = d.reserveElementsAtFront(n)
 		algorithm.Fill(newStart, d.start, val)
@@ -524,17 +524,17 @@ func (d *Deque) fillInsert(pos *DequeIter, n int, val Value) {
 		var len = d.Size()
 		if elemsBefore < len/2 {
 			var newStart = d.reserveElementsAtFront(n)
-			pos = nextN(clone(d.start), elemsBefore)
+			pos = NextN(Clone(d.start), elemsBefore)
 			algorithm.Copy(d.start, pos, newStart)
 			d.start = newStart
-			algorithm.Fill(prevN(clone(pos), n), pos, val)
+			algorithm.Fill(PrevN(Clone(pos), n), pos, val)
 		} else {
 			var newFinish = d.reserveElementsAtBack(n)
 			var elemsAfter = len - elemsBefore
-			pos = prevN(clone(d.finish), elemsAfter)
+			pos = PrevN(Clone(d.finish), elemsAfter)
 			algorithm.CopyBackward(pos, d.finish, newFinish)
 			d.finish = newFinish
-			algorithm.Fill(pos, nextN(clone(pos), n), val)
+			algorithm.Fill(pos, NextN(Clone(pos), n), val)
 		}
 	}
 }

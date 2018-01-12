@@ -52,11 +52,11 @@ func NewFromRange(first, last InputIter) *Vector {
 // Iterators
 
 func (v *Vector) Begin() *VectorIter {
-	return clone(v.start)
+	return Clone(v.start)
 }
 
 func (v *Vector) End() *VectorIter {
-	return clone(v.finish)
+	return Clone(v.finish)
 }
 
 func (v *Vector) RBegin() *ReverseIter {
@@ -125,19 +125,19 @@ func (v *Vector) Insert(pos *VectorIter, val Value) *VectorIter {
 		(*v.data)[v.finish.cur] = val
 		v.finish.cur++
 	} else {
-		v.insertAux(nextN(clone(v.start), n), val)
+		v.insertAux(NextN(Clone(v.start), n), val)
 	}
-	return nextN(clone(v.start), n)
+	return NextN(Clone(v.start), n)
 }
 
 func (v *Vector) RangeInsert(pos *VectorIter, first, last InputIter) *VectorIter {
 	v.rangeInsert(pos, first, last)
-	return clone(pos)
+	return Clone(pos)
 }
 
 func (v *Vector) FillInsert(pos *VectorIter, n int, val Value) *VectorIter {
 	v.fillInsert(pos, n, val)
-	return clone(pos)
+	return Clone(pos)
 }
 
 func (v *Vector) Erase(pos *VectorIter) *VectorIter {
@@ -173,7 +173,7 @@ func (v *Vector) Resize(newSize int) {
 	if newSize > len {
 		v.defaultAppend(newSize - len)
 	} else if newSize < len {
-		v.eraseAtEnd(nextN(clone(v.start), newSize))
+		v.eraseAtEnd(NextN(Clone(v.start), newSize))
 	}
 }
 
@@ -182,7 +182,7 @@ func (v *Vector) FillResize(newSize int, val Value) {
 	if newSize > len {
 		v.fillInsert(v.End(), newSize-len, val)
 	} else if newSize < len {
-		v.eraseAtEnd(nextN(clone(v.start), newSize))
+		v.eraseAtEnd(NextN(Clone(v.start), newSize))
 	}
 }
 
@@ -201,7 +201,7 @@ func (v *Vector) fillAssign(n int, val Value) {
 		if n > v.Capacity() {
 			v.extend(n - v.Capacity())
 		}
-		algorithm.Fill(v.start, nextN(clone(v.start), n), val)
+		algorithm.Fill(v.start, NextN(Clone(v.start), n), val)
 		v.finish.cur += n
 	} else {
 		v.eraseAtEnd(algorithm.FillN(v.start, n, val).(*VectorIter))
@@ -213,9 +213,9 @@ func (v *Vector) fillInsert(pos *VectorIter, n int, val Value) {
 		if v.endOfStorage.cur-v.finish.cur < n {
 			v.extend(v.checkLen(n) - v.Size())
 		}
-		algorithm.CopyBackward(pos, v.finish, nextN(clone(v.finish), n))
+		algorithm.CopyBackward(pos, v.finish, NextN(Clone(v.finish), n))
 		v.finish.NextN(n)
-		algorithm.Fill(pos, nextN(clone(pos), n), val)
+		algorithm.Fill(pos, NextN(Clone(pos), n), val)
 	}
 }
 
@@ -245,7 +245,7 @@ func (v *Vector) rangeInsert(pos *VectorIter, first, last InputIter) {
 			if v.endOfStorage.cur-v.finish.cur < n {
 				v.extend(v.checkLen(n) - v.Size())
 			}
-			algorithm.CopyBackward(pos, v.finish, nextN(clone(v.finish), n))
+			algorithm.CopyBackward(pos, v.finish, NextN(Clone(v.finish), n))
 			v.finish.NextN(n)
 			algorithm.Copy(first, last, pos)
 		}
@@ -265,7 +265,7 @@ func (v *Vector) checkLen(n int) int {
 func (v *Vector) insertAux(pos *VectorIter, val Value) {
 	(*v.data)[v.finish.cur] = (*v.data)[v.finish.cur-1]
 	v.finish.cur++
-	algorithm.CopyBackward(pos, prevN(clone(v.finish), 2), prevN(clone(v.finish), 1))
+	algorithm.CopyBackward(pos, PrevN(Clone(v.finish), 2), PrevN(Clone(v.finish), 1))
 	pos.DerefSet(val)
 }
 
@@ -284,13 +284,13 @@ func (v *Vector) eraseAtEnd(pos *VectorIter) {
 }
 
 func (v *Vector) erase(pos *VectorIter) *VectorIter {
-	var nextToPos = next(clone(pos))
+	var nextToPos = Next(Clone(pos))
 	if !nextToPos.Equal(v.finish) {
 		algorithm.Copy(nextToPos, v.finish, pos)
 	}
 	v.finish.cur--
 	(*v.data)[v.finish.cur] = nil
-	return clone(pos)
+	return Clone(pos)
 }
 
 func (v *Vector) rangeErase(first, last *VectorIter) *VectorIter {
@@ -298,9 +298,9 @@ func (v *Vector) rangeErase(first, last *VectorIter) *VectorIter {
 		if !last.Equal(v.finish) {
 			algorithm.Copy(last, v.finish, first)
 		}
-		v.eraseAtEnd(nextN(clone(first), last.Distance(v.finish)))
+		v.eraseAtEnd(NextN(Clone(first), last.Distance(v.finish)))
 	}
-	return clone(first)
+	return Clone(first)
 }
 
 func (v *Vector) assignAux(first, last InputIter) {
@@ -317,7 +317,7 @@ func (v *Vector) assignAux(first, last InputIter) {
 		}
 
 	default:
-		var cur = clone(v.start)
+		var cur = Clone(v.start)
 		for first = first.Clone().(InputIter); !first.Equal(last) &&
 			!cur.Equal(v.finish); first.Next() {
 			cur.DerefSet(first.Deref())

@@ -78,7 +78,7 @@ func TestShrinkToFit(t *testing.T) {
 func TestInsert(t *testing.T) {
 	var n = 512
 	var v = NewN(n)
-	var pos1 = v.Insert(nextN(v.Begin(), n/2), 1)
+	var pos1 = v.Insert(NextN(v.Begin(), n/2), 1)
 	assert.Equal(t, n+1, v.Size())
 	assert.Equal(t, n*2, v.Capacity())
 	assert.Equal(t, n/2, pos1.cur)
@@ -113,7 +113,7 @@ func TestRangeInsert(t *testing.T) {
 	var first, last = vec.NewIt(0, &tv), vec.NewIt(n/2, &tv)
 
 	var v = NewN(n)
-	var pos1 = v.RangeInsert(nextN(v.Begin(), n/2), first, last)
+	var pos1 = v.RangeInsert(NextN(v.Begin(), n/2), first, last)
 	assert.Equal(t, n+n/2, v.Size())
 	assert.Equal(t, n*2, v.Capacity())
 	assert.Equal(t, n/2, pos1.cur)
@@ -217,7 +217,7 @@ func TestInsertAux(t *testing.T) {
 	var n = 512
 	var v = NewN(n)
 	v.PushBack(nil) // double its capacity
-	var pos = nextN(clone(v.start), n/2)
+	var pos = NextN(Clone(v.start), n/2)
 
 	var val = 1
 	v.insertAux(pos, val)
@@ -250,7 +250,7 @@ func TestDefaultAppend(t *testing.T) {
 func TestEraseAtEnd(t *testing.T) {
 	var n, val = 512, 1
 	var v = NewNValues(n, val)
-	var pos = nextN(v.Begin(), n/2)
+	var pos = NextN(v.Begin(), n/2)
 
 	v.eraseAtEnd(pos)
 	assert.Equal(t, n/2, v.Size())
@@ -289,7 +289,7 @@ func TestErase(t *testing.T) {
 		}
 	}
 
-	test(nextN(v.Begin(), 2), []int{0, 1, 3, 4})
+	test(NextN(v.Begin(), 2), []int{0, 1, 3, 4})
 	test(v.Begin(), []int{1, 3, 4})
 	test(v.End(), []int{1, 3})
 }
@@ -309,8 +309,8 @@ func TestEraseRange(t *testing.T) {
 		}
 	}
 
-	test(nextN(v.Begin(), 2), prevN(v.End(), 2), []int{0, 1, 8, 9})
-	test(v.Begin(), nextN(v.Begin(), 1), []int{1, 8, 9})
+	test(NextN(v.Begin(), 2), PrevN(v.End(), 2), []int{0, 1, 8, 9})
+	test(v.Begin(), NextN(v.Begin(), 1), []int{1, 8, 9})
 	test(v.Begin(), v.End(), nil)
 }
 

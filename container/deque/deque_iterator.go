@@ -106,26 +106,31 @@ func (it *DequeIter) Distance(r IterCRef) int {
 
 // util funcs
 
-func nextN(it *DequeIter, n int) *DequeIter {
-	it.NextN(n)
-	return it
-}
-
-func prevN(it *DequeIter, n int) *DequeIter {
-	it.PrevN(n)
-	return it
-}
-
-func next(it *DequeIter) *DequeIter {
+// Next moves an iterator forward.
+func Next(it *DequeIter) *DequeIter {
 	it.Next()
 	return it
 }
 
-func prev(it *DequeIter) *DequeIter {
+// Prev moves an iterator backward.
+func Prev(it *DequeIter) *DequeIter {
 	it.Prev()
 	return it
 }
 
-func clone(it *DequeIter) *DequeIter {
+// NextN moves an iterator forward by n.
+func NextN(it *DequeIter, n int) *DequeIter {
+	it.NextN(n)
+	return it
+}
+
+// PrevN moves an iterator backward by n.
+func PrevN(it *DequeIter, n int) *DequeIter {
+	it.PrevN(n)
+	return it
+}
+
+// Clone returns a copy of it.
+func Clone(it *DequeIter) *DequeIter {
 	return &DequeIter{it.cur, it.node, it.map_}
 }

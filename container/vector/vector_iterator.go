@@ -74,26 +74,31 @@ func (it *VectorIter) Distance(r IterCRef) int {
 	return r.(*VectorIter).cur - it.cur
 }
 
-func nextN(it *VectorIter, n int) *VectorIter {
-	it.NextN(n)
-	return it
-}
-
-func prevN(it *VectorIter, n int) *VectorIter {
-	it.PrevN(n)
-	return it
-}
-
-func next(it *VectorIter) *VectorIter {
+// Next moves an iterator forward.
+func Next(it *VectorIter) *VectorIter {
 	it.Next()
 	return it
 }
 
-func prev(it *VectorIter) *VectorIter {
+// Prev moves an iterator backward.
+func Prev(it *VectorIter) *VectorIter {
 	it.Prev()
 	return it
 }
 
-func clone(it *VectorIter) *VectorIter {
+// NextN moves an iterator forward by n.
+func NextN(it *VectorIter, n int) *VectorIter {
+	it.NextN(n)
+	return it
+}
+
+// PrevN moves an iterator backward by n.
+func PrevN(it *VectorIter, n int) *VectorIter {
+	it.PrevN(n)
+	return it
+}
+
+// Clone returns a copy of it.
+func Clone(it *VectorIter) *VectorIter {
 	return &VectorIter{it.cur, it.data}
 }
