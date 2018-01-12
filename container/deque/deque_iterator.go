@@ -83,6 +83,35 @@ func (it *DequeIter) PrevN(n int) {
 	it.NextN(-n)
 }
 
+// Next2 moves an iterator forward.
+func (it *DequeIter) Next2() *DequeIter {
+	it.Next()
+	return it
+}
+
+// Prev2 moves an iterator backward.
+func (it *DequeIter) Prev2() *DequeIter {
+	it.Prev()
+	return it
+}
+
+// NextN2 moves an iterator forward by n.
+func (it *DequeIter) NextN2(n int) *DequeIter {
+	it.NextN(n)
+	return it
+}
+
+// PrevN2 moves an iterator backward by n.
+func (it *DequeIter) PrevN2(n int) *DequeIter {
+	it.PrevN(n)
+	return it
+}
+
+// Clone2 returns a copy of it.
+func (it *DequeIter) Clone2() *DequeIter {
+	return &DequeIter{it.cur, it.node, it.map_}
+}
+
 // Equal checks if given iterator is equal to this iterator.
 func (it *DequeIter) Equal(r IterCRef) bool {
 	var r_ = r.(*DequeIter)
@@ -102,35 +131,4 @@ func (it *DequeIter) LessThan(r IterCRef) bool {
 func (it *DequeIter) Distance(r IterCRef) int {
 	var r_ = r.(*DequeIter)
 	return (r_.node-it.node)*DequeBufSize + r_.cur - it.cur
-}
-
-// util funcs
-
-// Next moves an iterator forward.
-func Next(it *DequeIter) *DequeIter {
-	it.Next()
-	return it
-}
-
-// Prev moves an iterator backward.
-func Prev(it *DequeIter) *DequeIter {
-	it.Prev()
-	return it
-}
-
-// NextN moves an iterator forward by n.
-func NextN(it *DequeIter, n int) *DequeIter {
-	it.NextN(n)
-	return it
-}
-
-// PrevN moves an iterator backward by n.
-func PrevN(it *DequeIter, n int) *DequeIter {
-	it.PrevN(n)
-	return it
-}
-
-// Clone returns a copy of it.
-func Clone(it *DequeIter) *DequeIter {
-	return &DequeIter{it.cur, it.node, it.map_}
 }

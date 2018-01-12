@@ -57,6 +57,35 @@ func (it *VectorIter) PrevN(n int) {
 	it.NextN(-n)
 }
 
+// Next2 moves an iterator forward.
+func (it *VectorIter) Next2() *VectorIter {
+	it.Next()
+	return it
+}
+
+// Prev2 moves an iterator backward.
+func (it *VectorIter) Prev2() *VectorIter {
+	it.Prev()
+	return it
+}
+
+// NextN2 moves an iterator forward by n.
+func (it *VectorIter) NextN2(n int) *VectorIter {
+	it.NextN(n)
+	return it
+}
+
+// PrevN2 moves an iterator backward by n.
+func (it *VectorIter) PrevN2(n int) *VectorIter {
+	it.PrevN(n)
+	return it
+}
+
+// Clone2 returns a copy of it.
+func (it *VectorIter) Clone2() *VectorIter {
+	return &VectorIter{it.cur, it.data}
+}
+
 // Equal checks if given iterator is equal to this iterator.
 func (it *VectorIter) Equal(r IterCRef) bool {
 	return *it == *r.(*VectorIter)
@@ -72,33 +101,4 @@ func (it *VectorIter) LessThan(r IterCRef) bool {
 // 	d = r - it.
 func (it *VectorIter) Distance(r IterCRef) int {
 	return r.(*VectorIter).cur - it.cur
-}
-
-// Next moves an iterator forward.
-func Next(it *VectorIter) *VectorIter {
-	it.Next()
-	return it
-}
-
-// Prev moves an iterator backward.
-func Prev(it *VectorIter) *VectorIter {
-	it.Prev()
-	return it
-}
-
-// NextN moves an iterator forward by n.
-func NextN(it *VectorIter, n int) *VectorIter {
-	it.NextN(n)
-	return it
-}
-
-// PrevN moves an iterator backward by n.
-func PrevN(it *VectorIter, n int) *VectorIter {
-	it.PrevN(n)
-	return it
-}
-
-// Clone returns a copy of it.
-func Clone(it *VectorIter) *VectorIter {
-	return &VectorIter{it.cur, it.data}
 }
