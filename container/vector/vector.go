@@ -163,7 +163,7 @@ func (v *Vector) PushBack(val Value) {
 	v.finish.cur++
 }
 
-func (v *Vector) PopBack(val Value) {
+func (v *Vector) PopBack() {
 	v.finish.cur--
 	(*v.data)[v.finish.cur] = nil
 }
@@ -186,7 +186,7 @@ func (v *Vector) FillResize(newSize int, val Value) {
 	}
 }
 
-// FillAssign assigns a given value to a Deque.
+// FillAssign assigns a given value to a Vector.
 func (v *Vector) FillAssign(size int, val Value) {
 	v.fillAssign(size, val)
 }
