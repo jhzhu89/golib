@@ -4,28 +4,12 @@ import (
 	"testing"
 
 	. "github.com/jhzhu89/golib/container/deque"
+	"github.com/jhzhu89/golib/container/testutil/vec"
 	"github.com/stretchr/testify/assert"
 )
 
-type vector []interface{}
-
-var _ InputIter = (*vectorIter)(nil)
-
-type vectorIter struct {
-	i    int
-	data *vector
-}
-
-func (it *vectorIter) Swap(r IterCRef) {
-	var r_ = r.(*vectorIter)
-	it.i, r_.i = r_.i, it.i
-}
-func (it *vectorIter) CopyAssign(r IterCRef) { it.i = r.(*vectorIter).i }
-func (it *vectorIter) Clone() IterRef        { return &vectorIter{it.i, it.data} }
-func (it *vectorIter) Deref() Value          { return (*it.data)[it.i] }
-func (it *vectorIter) Next()                 { it.i++ }
-func (it *vectorIter) Equal(r IterCRef) bool { return it.i == r.(*vectorIter).i }
-func (it *vectorIter) CanMultiPass()         {}
+type Vec = vec.Vec
+type VecIter = vec.VecIter
 
 var dequeBufSize = DequeBufSize
 
@@ -50,7 +34,7 @@ func TestNewDeque(t *testing.T) {
 	})
 
 	t.Run(`NewDequeFromRange`, func(t *testing.T) {
-		var v = make(vector, 0, 8*dequeBufSize)
+		var v = make(Vec, 0, 8*dequeBufSize)
 		for i := 0; i < 8*dequeBufSize; i++ {
 			v = append(v, i)
 		}
@@ -61,7 +45,7 @@ func TestNewDeque(t *testing.T) {
 			assert.Equal(t, empty, d.Empty())
 		}
 
-		var newIt = func(i int) *vectorIter { return &vectorIter{i, &v} }
+		var newIt = func(i int) *VecIter { return vec.NewIt(i, &v) }
 
 		test(newIt(0), newIt(1), 1, false)
 		test(newIt(0), newIt(dequeBufSize-1), dequeBufSize-1, false)
@@ -71,10 +55,10 @@ func TestNewDeque(t *testing.T) {
 }
 
 func TestDequeMethodsBlackbox(t *testing.T) {
-	t.Run(`ResizeAssign`, func(t *testing.T) {
+	t.Run(`FillResize`, func(t *testing.T) {
 		test := func(toSize, size int, empty bool) {
 			d := New()
-			d.ResizeAssign(toSize, 1)
+			d.FillResize(toSize, 1)
 			assert.Equal(t, size, d.Size())
 			assert.Equal(t, empty, d.Empty())
 
@@ -129,19 +113,19 @@ func TestDequeMethodsBlackbox(t *testing.T) {
 		}
 	})
 
-	t.Run(`AssignRange`, func(t *testing.T) {
+	t.Run(`RangeAssign`, func(t *testing.T) {
 		var d = New()
 		var n = 10
 		for i := 0; i < n; i++ {
 			d.PushBack(n - i)
 		}
 
-		var v = make(vector, 0, dequeBufSize)
+		var v = make(Vec, 0, dequeBufSize)
 		for i := 0; i < dequeBufSize; i++ {
 			v = append(v, i)
 		}
 
-		d.AssignRange(&vectorIter{0, &v}, &vectorIter{dequeBufSize, &v})
+		d.RangeAssign(vec.NewIt(0, &v), vec.NewIt(dequeBufSize, &v))
 		for i := 0; i < dequeBufSize; i++ {
 			assert.Equal(t, i, d.At(i))
 		}
@@ -169,20 +153,20 @@ func TestDequeMethodsBlackbox(t *testing.T) {
 		}
 	})
 
-	t.Run(`InsertRange`, func(t *testing.T) {
-		var v = make(vector, 0, 8*dequeBufSize)
+	t.Run(`RangeInsert`, func(t *testing.T) {
+		var v = make(Vec, 0, 8*dequeBufSize)
 		for i := 0; i < 8*dequeBufSize; i++ {
 			v = append(v, i)
 		}
 
-		var newIt = func(i int) *vectorIter { return &vectorIter{i, &v} }
+		var newIt = func(i int) *VecIter { return vec.NewIt(i, &v) }
 
 		var d = NewN(10)
 		var begin = d.Begin()
 		var pos = d.Begin()
 		pos.NextN(5)
 
-		var newPos = d.InsertRange(pos, newIt(0), newIt(8*dequeBufSize))
+		var newPos = d.RangeInsert(pos, newIt(0), newIt(8*dequeBufSize))
 		assert.Equal(t, begin.Distance(pos), d.Begin().Distance(newPos))
 
 		for i := 0; i < 8*dequeBufSize; i++ {
@@ -231,7 +215,7 @@ func TestDequeMethodsBlackbox(t *testing.T) {
 		}
 	})
 
-	t.Run(`EraseRange`, func(t *testing.T) {
+	t.Run(`RangeErase`, func(t *testing.T) {
 		var d = New()
 		for i := 0; i < 8*dequeBufSize; i++ {
 			d.PushBack(i)
@@ -243,7 +227,7 @@ func TestDequeMethodsBlackbox(t *testing.T) {
 		last.NextN(3 * dequeBufSize)
 		var distance = d.Begin().Distance(first)
 
-		var newPos = d.EraseRange(first, last)
+		var newPos = d.RangeErase(first, last)
 
 		assert.Equal(t, distance, d.Begin().Distance(newPos))
 		assert.Equal(t, 7*dequeBufSize, d.Size())
