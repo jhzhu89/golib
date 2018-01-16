@@ -1,8 +1,12 @@
+// Copyright 2018-present Jiahao Zhu. All rights reserved.
+// Use of this source code is governed by a MIT license
+// that can be found in the LICENSE file.
+
 package deque
 
 var _ RandIter = (*DequeIter)(nil)
 
-// DequeIter implement a random access iterator.
+// DequeIter implements a random access iterator.
 type DequeIter struct {
 	cur  int
 	node int

@@ -1,7 +1,12 @@
+// Copyright 2018-present Jiahao Zhu. All rights reserved.
+// Use of this source code is governed by a MIT license
+// that can be found in the LICENSE file.
+
 package vector
 
 var _ RandIter = (*VectorIter)(nil)
 
+// VectorIter implements a random access iterator.
 type VectorIter struct {
 	cur  int
 	data **node

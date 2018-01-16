@@ -1,3 +1,14 @@
+// Copyright 2018-present Jiahao Zhu. All rights reserved.
+// Use of this source code is governed by a MIT license
+// that can be found in the LICENSE file.
+
+// Package vector implements a c++ STL-like vector.
+//
+// To iterate over a vector (where v is a *Vector):
+//	for it := v.Begin(); !it.Equal(v.End()); it.Next()) {
+//		val := it.Deref()
+//		// do something with val
+//	}
 package vector
 
 import (
@@ -19,16 +30,20 @@ type (
 	ReverseIter = iterator.ReverseIterator
 )
 
+// Vector represents a c++ STL-like vector. It is a standard container
+// which offers fixed time access to individual elements in any order.
 type Vector struct {
 	vectorImpl
 }
 
+// New creates a Vector with no elements.
 func New() *Vector {
 	v := &Vector{}
 	v.createStorage(0)
 	return v
 }
 
+// NewN creates a Vector with n nil elements.
 func NewN(n int) *Vector {
 	v := &Vector{}
 	v.createStorage(n)
@@ -36,6 +51,7 @@ func NewN(n int) *Vector {
 	return v
 }
 
+// NewNValues fills the Vector with n copies of val.
 func NewNValues(n int, val Value) *Vector {
 	v := &Vector{}
 	v.createStorage(n)
@@ -43,6 +59,8 @@ func NewNValues(n int, val Value) *Vector {
 	return v
 }
 
+// NewFromRange creates a Vector consisting of copies of the
+// elements from [first, last).
 func NewFromRange(first, last InputIter) *Vector {
 	v := New()
 	v.rangeInitialize(first, last)
@@ -51,32 +69,46 @@ func NewFromRange(first, last InputIter) *Vector {
 
 // Iterators
 
+// Begin returns a read/write iterator that points to the first element in the
+// Vector. Iteration is done in ordinary element order.
 func (v *Vector) Begin() *VectorIter {
 	return v.start.Clone2()
 }
 
+// End returns a read/write iterator that points one past the last
+// element in the Vector. Iteration is done in ordinary
+// element order.
 func (v *Vector) End() *VectorIter {
 	return v.finish.Clone2()
 }
 
+// RBegin returns a read/write reverse iterator that points to the
+// last element in the Vector. Iteration is done in reverse
+// element order.
 func (v *Vector) RBegin() *ReverseIter {
 	return iterator.NewReverseIterator(v.finish)
 }
 
+// REnd returns a read/write reverse iterator that points to one
+// before the first element in the Vector. Iteration is done
+// in reverse element order.
 func (v *Vector) REnd() *ReverseIter {
 	return iterator.NewReverseIterator(v.start)
 }
 
 // Element access
 
+// At accesses data contained in the Vector by subscript.
 func (v *Vector) At(n int) Value {
 	return (*v.data)[v.start.cur+n]
 }
 
+// Front returns the data at the first element of the Vector.
 func (v *Vector) Front() Value {
 	return v.At(0)
 }
 
+// Back returns the data at the last element of the Vector.
 func (v *Vector) Back() Value {
 	return (*v.data)[v.finish.cur-1]
 }
@@ -88,20 +120,26 @@ func (v *Vector) Empty() bool {
 	return v.start.cur == v.finish.cur
 }
 
+// Size returns the number of elements in the Vector.
 func (v *Vector) Size() int {
 	return v.finish.cur - v.start.cur
 }
 
+// Reseve attempts to preallocate enough memory for specified number of
+// elements.
 func (v *Vector) Reserve(n int) {
 	if v.Capacity() < n {
 		v.extend(n - v.Capacity())
 	}
 }
 
+// Capacity returns the total number of elements that the Vector can
+// hold before needing to allocate more memory.
 func (v *Vector) Capacity() int {
 	return v.endOfStorage.cur - v.start.cur
 }
 
+// ShrinkToFit shrinks vector to reduce memory use.
 func (v *Vector) ShrinkToFit() bool {
 	if v.Capacity() == v.Size() {
 		return false
@@ -112,10 +150,13 @@ func (v *Vector) ShrinkToFit() bool {
 }
 
 // Modifiers
+
+// Clear erases all the elements.
 func (v *Vector) Clear() {
 	v.eraseAtEnd(v.start)
 }
 
+// Insert inserts given value into Vector before specified iterator.
 func (v *Vector) Insert(pos *VectorIter, val Value) *VectorIter {
 	var n = v.start.Distance(pos)
 	if v.finish.cur == v.endOfStorage.cur {
@@ -130,24 +171,29 @@ func (v *Vector) Insert(pos *VectorIter, val Value) *VectorIter {
 	return v.start.Clone2().NextN2(n)
 }
 
+// RangeInsert inserts a range into the Vector.
 func (v *Vector) RangeInsert(pos *VectorIter, first, last InputIter) *VectorIter {
 	v.rangeInsert(pos, first, last)
 	return pos.Clone2()
 }
 
+// FillInsert inserts a number of copies of given data into the Vector.
 func (v *Vector) FillInsert(pos *VectorIter, n int, val Value) *VectorIter {
 	v.fillInsert(pos, n, val)
 	return pos.Clone2()
 }
 
+// Erase removes element at given position.
 func (v *Vector) Erase(pos *VectorIter) *VectorIter {
 	return v.erase(pos)
 }
 
+// RangeErase removes a range of elements.
 func (v *Vector) RangeErase(first, last *VectorIter) *VectorIter {
 	return v.rangeErase(first, last)
 }
 
+// Swap swaps data with another Vector.
 func (v *Vector) Swap(x *Vector) {
 	v.data, x.data = x.data, v.data
 	v.start, x.start = x.start, v.start
@@ -155,6 +201,7 @@ func (v *Vector) Swap(x *Vector) {
 	v.endOfStorage, x.endOfStorage = x.endOfStorage, v.endOfStorage
 }
 
+// PushBack adds data to the end of the Vector.
 func (v *Vector) PushBack(val Value) {
 	if v.finish.Equal(v.endOfStorage) {
 		v.extend(v.checkLen(1) - v.Size())
@@ -163,11 +210,13 @@ func (v *Vector) PushBack(val Value) {
 	v.finish.cur++
 }
 
+// PopBack removes last element.
 func (v *Vector) PopBack() {
 	v.finish.cur--
 	(*v.data)[v.finish.cur] = nil
 }
 
+// Resize resizes the Vector to the specified number of elements.
 func (v *Vector) Resize(newSize int) {
 	var len = v.Size()
 	if newSize > len {
@@ -177,6 +226,8 @@ func (v *Vector) Resize(newSize int) {
 	}
 }
 
+// FillResize resizes the Vector to the specified number of elements.
+// val is the data with which new elements should be populated.
 func (v *Vector) FillResize(newSize int, val Value) {
 	var len = v.Size()
 	if newSize > len {

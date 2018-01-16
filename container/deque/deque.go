@@ -1,4 +1,4 @@
-// Copyright 2017-present Jiahao Zhu. All rights reserved.
+// Copyright 2018-present Jiahao Zhu. All rights reserved.
 // Use of this source code is governed by a MIT license
 // that can be found in the LICENSE file.
 
@@ -338,7 +338,7 @@ func (d *Deque) RangeInsert(pos *DequeIter, first, last InputIter) *DequeIter {
 	return d.start.Clone2().NextN2(offset)
 }
 
-//FillInsert inserts a number of copies of given data into the Deque.
+// FillInsert inserts a number of copies of given data into the Deque.
 func (d *Deque) FillInsert(pos *DequeIter, n int, val Value) *DequeIter {
 	var offset = d.start.Distance(pos)
 	d.fillInsert(pos, n, val)
