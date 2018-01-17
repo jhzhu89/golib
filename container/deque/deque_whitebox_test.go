@@ -113,7 +113,7 @@ func TestDestroyData(t *testing.T) {
 
 	var countNonNil = func() int {
 		var c int
-		for it := d.Begin(); !it.Equal(d.End()); it.Next() {
+		for it := d.Begin(); !it.EqualTo(d.End()); it.Next() {
 			if it.Deref() != nil {
 				c++
 			}

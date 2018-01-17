@@ -62,7 +62,7 @@ func TestDequeMethodsBlackbox(t *testing.T) {
 			assert.Equal(t, size, d.Size())
 			assert.Equal(t, empty, d.Empty())
 
-			for it := d.Begin(); !it.Equal(d.End()); it.Next() {
+			for it := d.Begin(); !it.EqualTo(d.End()); it.Next() {
 				assert.Equal(t, it.Deref(), 1)
 			}
 		}
@@ -134,13 +134,13 @@ func TestDequeMethodsBlackbox(t *testing.T) {
 	t.Run(`Insert`, func(t *testing.T) {
 		var d = New()
 		var it = d.Insert(d.Begin(), 1)
-		assert.True(t, it.Equal(d.Begin()))
+		assert.True(t, it.EqualTo(d.Begin()))
 		assert.Equal(t, 1, d.Size())
 
 		it = d.Insert(d.End(), 2)
 		var end = d.End()
 		end.Prev()
-		assert.True(t, it.Equal(end))
+		assert.True(t, it.EqualTo(end))
 		assert.Equal(t, 2, d.Size())
 
 		it = d.Insert(it, 3)
@@ -210,7 +210,7 @@ func TestDequeMethodsBlackbox(t *testing.T) {
 
 		assert.Equal(t, distance, d.Begin().Distance(newPos))
 		assert.Equal(t, 8*dequeBufSize-1, d.Size())
-		for it := d.Begin(); !it.Equal(d.End()); it.Next() {
+		for it := d.Begin(); !it.EqualTo(d.End()); it.Next() {
 			assert.NotEqual(t, 4*dequeBufSize, it.Deref())
 		}
 	})

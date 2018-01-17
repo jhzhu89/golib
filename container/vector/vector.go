@@ -203,7 +203,7 @@ func (v *Vector) Swap(x *Vector) {
 
 // PushBack adds data to the end of the Vector.
 func (v *Vector) PushBack(val Value) {
-	if v.finish.Equal(v.endOfStorage) {
+	if v.finish.EqualTo(v.endOfStorage) {
 		v.extend(v.checkLen(1) - v.Size())
 	}
 	(*v.data)[v.finish.cur] = val
@@ -282,7 +282,7 @@ func (v *Vector) rangeInitialize(first, last InputIter) {
 		v.finish = algorithm.Copy(first, last, v.start).(*VectorIter)
 
 	default:
-		for first = first.Clone().(InputIter); !first.Equal(last); first.Next() {
+		for first = first.Clone().(InputIter); !first.EqualTo(last); first.Next() {
 			v.PushBack(first.Deref())
 		}
 	}
@@ -291,7 +291,7 @@ func (v *Vector) rangeInitialize(first, last InputIter) {
 func (v *Vector) rangeInsert(pos *VectorIter, first, last InputIter) {
 	switch first.(type) {
 	case ForwardIter:
-		if !first.Equal(last) {
+		if !first.EqualTo(last) {
 			var n = iterator.Distance(first, last)
 			if v.endOfStorage.cur-v.finish.cur < n {
 				v.extend(v.checkLen(n) - v.Size())
@@ -302,7 +302,7 @@ func (v *Vector) rangeInsert(pos *VectorIter, first, last InputIter) {
 		}
 
 	default:
-		for first = first.Clone().(InputIter); !first.Equal(last); first.Next() {
+		for first = first.Clone().(InputIter); !first.EqualTo(last); first.Next() {
 			pos = v.Insert(pos, first.Deref())
 			pos.Next()
 		}
@@ -336,7 +336,7 @@ func (v *Vector) eraseAtEnd(pos *VectorIter) {
 
 func (v *Vector) erase(pos *VectorIter) *VectorIter {
 	var nextToPos = pos.Clone2().Next2()
-	if !nextToPos.Equal(v.finish) {
+	if !nextToPos.EqualTo(v.finish) {
 		algorithm.Copy(nextToPos, v.finish, pos)
 	}
 	v.finish.cur--
@@ -345,8 +345,8 @@ func (v *Vector) erase(pos *VectorIter) *VectorIter {
 }
 
 func (v *Vector) rangeErase(first, last *VectorIter) *VectorIter {
-	if !first.Equal(last) {
-		if !last.Equal(v.finish) {
+	if !first.EqualTo(last) {
+		if !last.EqualTo(v.finish) {
 			algorithm.Copy(last, v.finish, first)
 		}
 		v.eraseAtEnd(first.Clone2().NextN2(last.Distance(v.finish)))
@@ -369,13 +369,13 @@ func (v *Vector) assignAux(first, last InputIter) {
 
 	default:
 		var cur = v.start.Clone2()
-		for first = first.Clone().(InputIter); !first.Equal(last) &&
-			!cur.Equal(v.finish); first.Next() {
+		for first = first.Clone().(InputIter); !first.EqualTo(last) &&
+			!cur.EqualTo(v.finish); first.Next() {
 			cur.DerefSet(first.Deref())
 			cur.Next()
 		}
 
-		if first.Equal(last) {
+		if first.EqualTo(last) {
 			v.eraseAtEnd(cur)
 		} else {
 			v.rangeInsert(v.finish, first, last)

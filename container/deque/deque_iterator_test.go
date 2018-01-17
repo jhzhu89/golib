@@ -28,10 +28,10 @@ func TestDequeIter(t *testing.T) {
 	t.Run(`Equal`, func(t *testing.T) {
 		var it1 = &DequeIter{}
 		var it2 = &DequeIter{10, 10, nil}
-		assert.False(t, it1.Equal(it2))
+		assert.False(t, it1.EqualTo(it2))
 
 		var it3 = &DequeIter{}
-		assert.True(t, it1.Equal(it3))
+		assert.True(t, it1.EqualTo(it3))
 	})
 
 	t.Run(`LessThan`, func(t *testing.T) {

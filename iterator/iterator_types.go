@@ -65,7 +65,7 @@ type InputIterator interface {
 	Iterator
 	// *it
 	Deref() Value
-	Equal(r IterCRef) bool
+	EqualTo(r IterCRef) bool
 }
 
 type MutableInputIterator interface {

@@ -84,7 +84,7 @@ func TestExportedMethods(t *testing.T) {
 		v.Resize(size)
 		assert.Equal(t, size, v.Size())
 		assert.Equal(t, size, v.Capacity())
-		for it := v.Begin(); !it.Equal(v.End()); it.Next() {
+		for it := v.Begin(); !it.EqualTo(v.End()); it.Next() {
 			assert.Nil(t, it.Deref())
 		}
 
@@ -99,14 +99,14 @@ func TestExportedMethods(t *testing.T) {
 		v.FillResize(size, 1)
 		assert.Equal(t, size, v.Size())
 		assert.Equal(t, size, v.Capacity())
-		for it := v.Begin(); !it.Equal(v.End()); it.Next() {
+		for it := v.Begin(); !it.EqualTo(v.End()); it.Next() {
 			assert.Equal(t, 1, it.Deref())
 		}
 
 		v.FillResize(size/2, 1)
 		assert.Equal(t, size/2, v.Size())
 		assert.Equal(t, size, v.Capacity())
-		for it := v.Begin(); !it.Equal(v.End()); it.Next() {
+		for it := v.Begin(); !it.EqualTo(v.End()); it.Next() {
 			assert.Equal(t, 1, it.Deref())
 		}
 	})
@@ -116,7 +116,7 @@ func TestExportedMethods(t *testing.T) {
 		var size = 512
 		v.FillAssign(size, 1)
 		assert.Equal(t, size, v.Size())
-		for it := v.Begin(); !it.Equal(v.End()); it.Next() {
+		for it := v.Begin(); !it.EqualTo(v.End()); it.Next() {
 			assert.Equal(t, 1, it.Deref())
 		}
 	})
@@ -128,7 +128,7 @@ func TestExportedMethods(t *testing.T) {
 
 		v1.RangeAssign(v2.Begin(), v2.End())
 		assert.Equal(t, size, v1.Size())
-		for it := v1.Begin(); !it.Equal(v1.End()); it.Next() {
+		for it := v1.Begin(); !it.EqualTo(v1.End()); it.Next() {
 			assert.Equal(t, 1, it.Deref())
 		}
 	})

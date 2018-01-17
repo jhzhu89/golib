@@ -91,8 +91,8 @@ func (it *VectorIter) Clone2() *VectorIter {
 	return &VectorIter{it.cur, it.data}
 }
 
-// Equal checks if given iterator is equal to this iterator.
-func (it *VectorIter) Equal(r IterCRef) bool {
+// EqualTo checks if given iterator is equal to this iterator.
+func (it *VectorIter) EqualTo(r IterCRef) bool {
 	return *it == *r.(*VectorIter)
 }
 
