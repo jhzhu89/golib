@@ -68,7 +68,7 @@ func (it *intSliceIter) DerefSet(val Value) {
 	(*it.data)[it.i] = val
 }
 
-func (it *intSliceIter) Equal(r interface{}) bool {
+func (it *intSliceIter) EqualTo(r interface{}) bool {
 	return it.i == r.(*intSliceIter).i
 }
 

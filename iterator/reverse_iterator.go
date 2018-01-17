@@ -58,8 +58,8 @@ func (it *ReverseIterator) DerefSet(val Value) {
 	it.iter.(OutputIter).DerefSet(val)
 }
 
-func (it *ReverseIterator) Equal(r IterCRef) bool {
-	return it.iter.Equal(r.(*ReverseIterator).iter)
+func (it *ReverseIterator) EqualTo(r IterCRef) bool {
+	return it.iter.EqualTo(r.(*ReverseIterator).iter)
 }
 
 func (it *ReverseIterator) Next() {
@@ -74,7 +74,7 @@ func (it *ReverseIterator) LessThan(r IterCRef) bool {
 	if !it.canRandAccess {
 		panic("not a RandomAccessIterator")
 	}
-	return !it.iter.(RandIter).LessThan(r.(*ReverseIterator).iter) && !it.Equal(r)
+	return !it.iter.(RandIter).LessThan(r.(*ReverseIterator).iter) && !it.EqualTo(r)
 }
 
 func (it *ReverseIterator) NextN(n int) {

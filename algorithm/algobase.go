@@ -1,7 +1,7 @@
 package algorithm
 
 func Fill(first, last MForwardIter, val Value) {
-	for f := first.Clone().(MForwardIter); !f.Equal(last); f.Next() {
+	for f := first.Clone().(MForwardIter); !f.EqualTo(last); f.Next() {
 		f.DerefSet(val)
 	}
 }
@@ -28,7 +28,7 @@ func Copy(first, last InputIter, result OutputIter) OutputIter {
 		}
 
 	default:
-		for !first.Equal(last) {
+		for !first.EqualTo(last) {
 			result.DerefSet(first.Deref())
 			first.Next()
 			result.Next()
@@ -51,7 +51,7 @@ func CopyBackward(first, last BidirectIter, result MBidirectIter) MBidirectIter 
 		}
 
 	default:
-		for !last.Equal(first) {
+		for !last.EqualTo(first) {
 			last.Prev()
 			result.Prev()
 			result.DerefSet(last.Deref())

@@ -116,8 +116,8 @@ func (it *DequeIter) Clone2() *DequeIter {
 	return &DequeIter{it.cur, it.node, it.map_}
 }
 
-// Equal checks if given iterator is equal to this iterator.
-func (it *DequeIter) Equal(r IterCRef) bool {
+// EqualTo checks if given iterator is equal to this iterator.
+func (it *DequeIter) EqualTo(r IterCRef) bool {
 	var r_ = r.(*DequeIter)
 	return it.map_ == r_.map_ && it.node == r_.node && it.cur == r_.cur
 }

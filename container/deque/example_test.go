@@ -19,7 +19,7 @@ func Example() {
 	d.PushBack(nil)
 
 	// Iterate through deque and print its contents.
-	for it := d.Begin(); !it.Equal(d.End()); it.Next() {
+	for it := d.Begin(); !it.EqualTo(d.End()); it.Next() {
 		fmt.Println(it.Deref())
 	}
 	// Output: 1

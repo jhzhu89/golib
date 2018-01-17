@@ -24,7 +24,7 @@ func TestReverse(t *testing.T) {
 
 	var rit2 = NewReverseIterator(it)
 	rit2.PrevN(100)
-	assert.True(t, rit.Equal(rit2))
+	assert.True(t, rit.EqualTo(rit2))
 
 	rit2.Next()
 	assert.True(t, rit.LessThan(rit2))

@@ -153,7 +153,7 @@ func (d *Deque) ShrinkToFit() bool {
 
 // Empty returns true if the Deuqe is empty.
 func (d *Deque) Empty() bool {
-	return d.start.Equal(d.finish)
+	return d.start.EqualTo(d.finish)
 }
 
 // Element access
@@ -353,7 +353,7 @@ func (d *Deque) Erase(pos *DequeIter) *DequeIter {
 		algorithm.CopyBackward(d.start, pos, next)
 		d.PopFront()
 	} else {
-		if !next.Equal(d.finish) {
+		if !next.EqualTo(d.finish) {
 			algorithm.Copy(next, d.finish, pos)
 		}
 		d.PopBack()
@@ -363,21 +363,21 @@ func (d *Deque) Erase(pos *DequeIter) *DequeIter {
 
 // RangeErase removes a range of elements.
 func (d *Deque) RangeErase(first, last *DequeIter) *DequeIter {
-	if first.Equal(last) {
+	if first.EqualTo(last) {
 		return first
-	} else if first.Equal(d.start) && last.Equal(d.finish) {
+	} else if first.EqualTo(d.start) && last.EqualTo(d.finish) {
 		d.Clear()
 		return d.End()
 	} else {
 		var n = first.Distance(last)
 		var elemsBefore = d.start.Distance(first)
 		if elemsBefore <= (d.Size()-n)/2 {
-			if !first.Equal(d.start) {
+			if !first.EqualTo(d.start) {
 				algorithm.CopyBackward(d.start, first, last)
 			}
 			d.eraseAtBegin(d.start.Clone2().NextN2(n))
 		} else {
-			if !last.Equal(d.finish) {
+			if !last.EqualTo(d.finish) {
 				algorithm.Copy(last, d.finish, first)
 			}
 			d.eraseAtEnd(d.finish.Clone2().PrevN2(n))
@@ -548,7 +548,7 @@ func (d *Deque) rangeInitialize(first, last InputIter) {
 
 	default:
 		d.initializeMap(0)
-		for first = first.Clone().(InputIter); !first.Equal(last); first.Next() {
+		for first = first.Clone().(InputIter); !first.EqualTo(last); first.Next() {
 			d.PushBack(first.Deref())
 		}
 	}
