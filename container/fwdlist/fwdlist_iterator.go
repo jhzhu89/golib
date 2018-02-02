@@ -47,6 +47,14 @@ func (it *ForwardListIter) Next2() *ForwardListIter {
 	return it
 }
 
+func (it *ForwardListIter) next() *ForwardListIter {
+	var it_ = &ForwardListIter{}
+	if it.node != nil {
+		it_.node = it.node.next
+	}
+	return it_
+}
+
 // Clone returns a copy of this iterator.
 func (it *ForwardListIter) Clone() IterRef {
 	return &ForwardListIter{it.node}
@@ -57,7 +65,7 @@ func (it *ForwardListIter) Clone2() *ForwardListIter {
 	return &ForwardListIter{it.node}
 }
 
-// Equal checks if given iterator is equal to this iterator.
-func (it *ForwardListIter) Equal(r IterCRef) bool {
+// EqualTo checks if given iterator is equal to this iterator.
+func (it *ForwardListIter) EqualTo(r IterCRef) bool {
 	return *it == *r.(*ForwardListIter)
 }
