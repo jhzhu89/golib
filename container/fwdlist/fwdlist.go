@@ -215,8 +215,8 @@ func (fl *ForwardList) SpliceAfter(pos *ForwardListIter, list *ForwardList) {
 
 // SpliceElementAfter removes the element in list referenced by i and inserts it
 // into the current list after pos.
-func (fl *ForwardList) SpliceElementAfter(pos *ForwardListIter, list *ForwardList, i *ForwardListIter) {
-	fl.spliceElementAfter(pos, list, i)
+func (fl *ForwardList) SpliceElementAfter(pos *ForwardListIter, i *ForwardListIter) {
+	fl.spliceElementAfter(pos, i)
 }
 
 // RangeSpliceAfter inserts range from another ForwardList.
@@ -359,7 +359,7 @@ func (fl *ForwardList) spliceAfter(pos, before, last *ForwardListIter) *ForwardL
 	}
 }
 
-func (fl *ForwardList) spliceElementAfter(pos *ForwardListIter, list *ForwardList, i *ForwardListIter) {
+func (fl *ForwardList) spliceElementAfter(pos *ForwardListIter, i *ForwardListIter) {
 	var j = i.Clone2()
 	j.Next()
 
@@ -530,10 +530,11 @@ func (n *fwdListNode) reverseAfter() {
 	if tail == nil {
 		return
 	}
-	for temp := tail.next; temp != nil; {
+
+	for tail.next != nil {
 		var keep = n.next
-		n.next = temp
-		tail.next = temp.next
+		n.next = tail.next
+		tail.next = tail.next.next
 		n.next.next = keep
 	}
 }
