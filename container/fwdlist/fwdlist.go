@@ -4,7 +4,7 @@
 
 // Package fwdlist implements a c++ STL-like forward list.
 //
-// To iterate over a vector (where fl is a *ForwardList):
+// To iterate over a fwdlist (where fl is a *ForwardList):
 //	for it := fl.Begin(); !it.Equal(fl.End()); it.Next()) {
 //		val := it.Deref()
 //		// do something with val
@@ -29,8 +29,8 @@ type (
 	ReverseIter = iterator.ReverseIterator
 )
 
-// ForwardList represents a c++ STL-like vector. It is a standard container
-// which offers fixed time access to individual elements in any order.
+// ForwardList represents a c++ STL-like forward list. It is a standard container with linear
+// time access to elements, and fixed time insertion/deletion at any point in the sequence.
 type ForwardList struct {
 	head *fwdListNode
 }
