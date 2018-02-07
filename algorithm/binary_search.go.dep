@@ -1,0 +1,13 @@
+package algorithm
+
+func LowerBound(first, last Iter, val Value) Iter {
+	return nil
+}
+
+func UpperBound(first, last Iter, val Value) Iter {
+	return nil
+}
+
+func BinarySearch(first, last Iter, val Value) bool {
+	return false
+}

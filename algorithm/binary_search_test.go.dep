@@ -1,0 +1,13 @@
+package algorithm
+
+import (
+	"testing"
+)
+
+func TestLowerBound(t *testing.T) {
+	t.Error("under construction...")
+}
+
+func TestUpperBound(t *testing.T) {
+	t.Error("under construction...")
+}
