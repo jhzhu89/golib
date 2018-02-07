@@ -102,7 +102,7 @@ func TestSpliceAfter(t *testing.T) {
 	assert.Equal(t, 4, fl1.Begin().Deref())
 }
 
-func count(fl *ForwardList) int {
+func Count(fl *ForwardList) int {
 	var c int
 	for it := fl.Begin(); !it.EqualTo(fl.End()); it.Next() {
 		c++
@@ -121,7 +121,7 @@ func TestAssignN(t *testing.T) {
 		}
 		assert.Equal(t, v1, it.Deref())
 	}
-	assert.Equal(t, n, count(fl))
+	assert.Equal(t, n, Count(fl))
 
 	fl.assignN(n/2, v2)
 	for i := 0; i < n/2; i++ {
@@ -131,24 +131,24 @@ func TestAssignN(t *testing.T) {
 		}
 		assert.Equal(t, v2, it.Deref())
 	}
-	assert.Equal(t, n/2, count(fl))
+	assert.Equal(t, n/2, Count(fl))
 }
 
 func TestRangeAssign(t *testing.T) {
 	var n, v1, v2 = 1024, 1, 2
 	fl := New()
 	fl1 := NewNValues(n, v1)
-	assert.Equal(t, n, count(fl1))
+	assert.Equal(t, n, Count(fl1))
 	fl.rangeAssign(fl1.Begin(), fl1.End())
-	assert.Equal(t, n, count(fl))
+	assert.Equal(t, n, Count(fl))
 	for it := fl.Begin(); !it.EqualTo(fl.End()); it.Next() {
 		assert.Equal(t, v1, it.Deref())
 	}
 
 	fl2 := NewNValues(n/2, v2)
-	assert.Equal(t, n/2, count(fl2))
+	assert.Equal(t, n/2, Count(fl2))
 	fl.rangeAssign(fl2.Begin(), fl2.End())
-	assert.Equal(t, n/2, count(fl))
+	assert.Equal(t, n/2, Count(fl))
 	for it := fl.Begin(); !it.EqualTo(fl.End()); it.Next() {
 		assert.Equal(t, v2, it.Deref())
 	}
@@ -205,16 +205,16 @@ func TestTransferAfter(t *testing.T) {
 	var node = fl2.BeforeBegin().node.transferAfter(fl1.BeforeBegin().node, fl1.Begin().node)
 	assert.NotNil(t, node)
 	assert.Equal(t, 0, node.val)
-	assert.Equal(t, n-1, count(fl1))
+	assert.Equal(t, n-1, Count(fl1))
 	assert.Equal(t, 1, fl1.Begin().Deref())
-	assert.Equal(t, 1, count(fl2))
+	assert.Equal(t, 1, Count(fl2))
 	assert.Equal(t, 0, fl2.Begin().Deref())
 
 	node = fl2.BeforeBegin().node.transferAfter(fl1.Begin().node, fl1.End().node)
 	assert.Nil(t, node)
-	assert.Equal(t, 1, count(fl1))
+	assert.Equal(t, 1, Count(fl1))
 	// the 'end' node is null, so the one element in fl2 is dropped, the size should be n-2.
-	assert.Equal(t, n-2, count(fl2))
+	assert.Equal(t, n-2, Count(fl2))
 }
 
 func TestReverseAfter(t *testing.T) {

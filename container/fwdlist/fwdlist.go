@@ -161,7 +161,7 @@ func (fl *ForwardList) Resize(newSize int) {
 	var k = fl.BeforeBegin()
 
 	var len = 0
-	for k.next() != fl.End() && len < newSize {
+	for *k.next() != *fl.End() && len < newSize {
 		k.Next()
 		len++
 	}
@@ -178,7 +178,7 @@ func (fl *ForwardList) FillResize(newSize int, val Value) {
 	var k = fl.BeforeBegin()
 
 	var len = 0
-	for k.next() != fl.End() && len < newSize {
+	for *k.next() != *fl.End() && len < newSize {
 		k.Next()
 		len++
 	}
@@ -237,8 +237,8 @@ func (fl *ForwardList) Remove(val Value) {
 			} else {
 				extra = curr
 			}
-			curr = curr.next
 		}
+		curr = curr.next
 	}
 
 	if extra != nil {
@@ -286,7 +286,7 @@ func (fl *ForwardList) Reverse() {
 	fl.head.reverseAfter()
 }
 
-// Sort reverses the elements in list.
+// Sort sorts the elements in list.
 func (fl *ForwardList) Sort(comp fn.Compatator) {
 	fl.sort(comp)
 }
