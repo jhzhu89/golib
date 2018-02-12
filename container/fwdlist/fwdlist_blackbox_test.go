@@ -68,13 +68,13 @@ func TestFillResize(t *testing.T) {
 
 func TestFillAssign(t *testing.T) {
 	fl := fwdlist.New()
-	fl.FillAssign(1024, 1)
+	fl.AssignN(1024, 1)
 	assert.Equal(t, 1024, fwdlist.Count(fl))
 	for it := fl.Begin(); !it.EqualTo(fl.End()); it.Next() {
 		assert.Equal(t, 1, it.Deref())
 	}
 
-	fl.FillAssign(512, 2)
+	fl.AssignN(512, 2)
 	assert.Equal(t, 512, fwdlist.Count(fl))
 	for it := fl.Begin(); !it.EqualTo(fl.End()); it.Next() {
 		assert.Equal(t, 2, it.Deref())
@@ -112,8 +112,8 @@ func TestUnique(t *testing.T) {
 	fl.Unique()
 	assert.Equal(t, 1, fwdlist.Count(fl))
 
-	fl.FillInsertAfter(fl.BeforeBegin(), 10, 2)
-	fl.FillInsertAfter(fl.BeforeBegin(), 10, 3)
+	fl.InsertNAfter(fl.BeforeBegin(), 10, 2)
+	fl.InsertNAfter(fl.BeforeBegin(), 10, 3)
 	fl.Unique()
 	assert.Equal(t, 3, fwdlist.Count(fl))
 

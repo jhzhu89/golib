@@ -119,8 +119,8 @@ func (fl *ForwardList) RangeInsertAfter(pos *ForwardListIter, first, last InputI
 	}
 }
 
-// FillInsertAfter inserts a number of copies of given data into the ForwardList.
-func (fl *ForwardList) FillInsertAfter(pos *ForwardListIter, n int, val Value) *ForwardListIter {
+// InsertNAfter inserts a number of copies of given data into the ForwardList.
+func (fl *ForwardList) InsertNAfter(pos *ForwardListIter, n int, val Value) *ForwardListIter {
 	if n > 0 {
 		var tmp = NewNValues(n, val)
 		return fl.spliceAfter(pos, tmp.BeforeBegin(), tmp.End())
@@ -185,12 +185,12 @@ func (fl *ForwardList) FillResize(newSize int, val Value) {
 	if len == newSize {
 		fl.RangeEraseAfter(k, fl.End())
 	} else {
-		fl.FillInsertAfter(k, newSize-len, val)
+		fl.InsertNAfter(k, newSize-len, val)
 	}
 }
 
-// FillAssign assigns a given value to a ForwardList.
-func (fl *ForwardList) FillAssign(n int, val Value) {
+// AssignN assigns a given value to a ForwardList.
+func (fl *ForwardList) AssignN(n int, val Value) {
 	fl.assignN(n, val)
 }
 
@@ -386,7 +386,7 @@ func (fl *ForwardList) assignN(n int, val Value) {
 		n--
 	}
 	if n > 0 {
-		fl.FillInsertAfter(prev, n, val)
+		fl.InsertNAfter(prev, n, val)
 	} else if !curr.EqualTo(end) {
 		fl.RangeEraseAfter(prev, end)
 	}
