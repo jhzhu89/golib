@@ -40,18 +40,21 @@ func New() *List {
 	l.node.next = l.node
 	l.node.prev = l.node
 	l.setSize(0)
+	return l
 }
 
 // NewN creates a List with n nil elements.
 func NewN(n int) *List {
 	l := New()
 	l.defaultInitialize(n)
+	return l
 }
 
 // NewNValues fills the List with n copies of val.
 func NewNValues(n int, val Value) *List {
 	l := New()
 	l.fillInitialize(n, val)
+	return l
 }
 
 // NewFromRange creates a List consisting of copies of the
@@ -61,6 +64,7 @@ func NewFromRange(first, last InputIter) *List {
 	for first = first.Clone().(InputIter); !first.EqualTo(last); first.Next() {
 		l.PushBack(first.Deref())
 	}
+	return l
 }
 
 // Iterators
@@ -234,35 +238,83 @@ func (l *List) Merge(list *List, comp fn.Compatator) {
 
 // Splice inserts contents of another List.
 func (l *List) Splice(pos *ListIter, list *List) {
+	l.spliceList(pos, list)
 }
 
 // SpliceElementAfter removes the element in list referenced by i and inserts it
 // into the current list after pos.
-func (l *List) SpliceElementAfter(pos *ListIter, i *ListIter) {
+func (l *List) SpliceElement(pos *ListIter, list *List, i *ListIter) {
+	l.spliceElement(pos, list, i)
 }
 
 // RangeSpliceAfter inserts range from another List.
-func (l *List) RangeSpliceAfter(pos, before, last *ListIter) {
+func (l *List) RangeSplice(pos *ListIter, list *List, first, last *ListIter) {
+	l.rangeSplice(pos, list, first, last)
 }
 
 // Remove removes all elements equal to value.
 func (l *List) Remove(val Value) {
+	var first, last = l.Begin(), l.End()
+	for !first.EqualTo(last) {
+		var next = first.Clone2().Next2()
+		if first.Deref() == val {
+			l.erase(first)
+		}
+		first = next
+	}
 }
 
 // RemoveIf removes all elements satisfying a predicate.
 func (l *List) RemoveIf(pred fn.Predicator) {
+	var first, last = l.Begin(), l.End()
+	for !first.EqualTo(last) {
+		var next = first.Clone2().Next2()
+		if pred.Predicate(first.Deref()) {
+			l.erase(first)
+		}
+		first = next
+	}
 }
 
 // Unique removes consecutive duplicate elements.
 func (l *List) Unique() {
+	var first, last = l.Begin(), l.End()
+	if first.EqualTo(last) {
+		return
+	}
+
+	var next = first.Clone2().Next2()
+	for !next.EqualTo(last) {
+		if first.Deref() == next.Deref() {
+			l.erase(next)
+		} else {
+			first = next
+		}
+		next = first.Next2()
+	}
 }
 
 // UniqueIf removes consecutive elements satisfying a predicate.
 func (l *List) UniqueIf(binPred fn.BinaryPredicator) {
+	var first, last = l.Begin(), l.End()
+	if first.EqualTo(last) {
+		return
+	}
+
+	var next = first.Clone2().Next2()
+	for !next.EqualTo(last) {
+		if binPred.Predicate(first.Deref(), next.Deref()) {
+			l.erase(next)
+		} else {
+			first = next
+		}
+		next = first.Next2()
+	}
 }
 
 // Reverse reverses the elements in list.
 func (l *List) Reverse() {
+	l.node.reverse()
 }
 
 // Sort sorts the elements in list.
@@ -332,10 +384,7 @@ func (l *List) insert(pos *ListIter, val Value) *ListIter {
 	return &ListIter{tmp}
 }
 
-func (l *List) splice(pos, first, last *ListIter) *ListIter {
-}
-
-func (l *List) spliceList(pos *ListIter, x *List) *ListIter {
+func (l *List) spliceList(pos *ListIter, x *List) {
 	if !x.Empty() {
 		l.transfer(pos, x.Begin(), x.End())
 		l.incSize(x.getSize())
@@ -343,7 +392,25 @@ func (l *List) spliceList(pos *ListIter, x *List) *ListIter {
 	}
 }
 
-func (l *List) spliceElement(pos *ListIter, i *ListIter) {
+func (l *List) spliceElement(pos *ListIter, x *List, i *ListIter) {
+	var j = i.Clone2()
+	j.Next()
+	if pos.EqualTo(i) || pos.EqualTo(j) {
+		return
+	}
+
+	l.transfer(pos, i, j)
+	l.incSize(1)
+	x.decSize(1)
+}
+
+func (l *List) rangeSplice(pos *ListIter, x *List, first, last *ListIter) {
+	if !first.EqualTo(last) {
+		var n = l.distance(first.node, last.node)
+		l.incSize(n)
+		x.decSize(n)
+		l.transfer(pos, first, last)
+	}
 }
 
 func (l *List) defaultInsert(pos *ListIter, n int) {
@@ -381,7 +448,6 @@ func (l *List) rangeAssign(first2, last2 InputIter) {
 func (l *List) merge(list *List, comp fn.Compatator) {
 	var first1, last1 = l.Begin(), l.End()
 	var first2, last2 = list.Begin(), list.End()
-	var origSize = list.Size()
 
 	for !first1.EqualTo(last1) && !first2.EqualTo(last2) {
 		if comp.Compare(first2.Deref(), first1.Deref()) {
@@ -433,6 +499,15 @@ func (l *List) defaultAppend(n int) {
 	}
 }
 
+func (l *List) distance(first, last *listNode) int {
+	var n = 0
+	for first != last {
+		first = first.next
+		n++
+	}
+	return n
+}
+
 type listNode struct {
 	next, prev *listNode
 	val        Value
@@ -476,7 +551,4 @@ func (n *listNode) unhook() {
 	var prevNode = n.prev
 	prevNode.next = nextNode
 	nextNode.prev = prevNode
-}
-
-func distance(first, last *listNode) int {
 }
