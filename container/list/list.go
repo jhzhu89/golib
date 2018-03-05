@@ -319,6 +319,7 @@ func (l *List) Reverse() {
 
 // Sort sorts the elements in list.
 func (l *List) Sort(comp fn.Compatator) {
+	l.sort(comp)
 }
 
 func (l *List) getSize() int {
@@ -361,9 +362,6 @@ func (l *List) fillInitialize(n int, val Value) {
 	for ; n > 0; n-- {
 		l.PushBack(val)
 	}
-}
-
-func (l *List) rangeInitialize(first, last InputIter) {
 }
 
 func (l *List) createNode(val Value) *listNode {
@@ -411,9 +409,6 @@ func (l *List) rangeSplice(pos *ListIter, x *List, first, last *ListIter) {
 		x.decSize(n)
 		l.transfer(pos, first, last)
 	}
-}
-
-func (l *List) defaultInsert(pos *ListIter, n int) {
 }
 
 func (l *List) fillAssign(n int, val Value) {
@@ -468,6 +463,37 @@ func (l *List) merge(list *List, comp fn.Compatator) {
 }
 
 func (l *List) sort(comp fn.Compatator) {
+	if l.node.next != l.node && l.node.next.next != l.node {
+		var carry = New()
+		var n = 64
+		var tmp = make([]*List, n, n)
+		for i := 0; i < n; i++ {
+			tmp[i] = New()
+		}
+		var fill, counter = 0, 0
+
+		for {
+			carry.spliceElement(carry.Begin(), l, l.Begin())
+
+			for counter = 0; counter != fill && !tmp[counter].Empty(); counter++ {
+				tmp[counter].merge(carry, comp)
+				carry.Swap(tmp[counter])
+			}
+			carry.Swap(tmp[counter])
+			if counter == fill {
+				fill++
+			}
+
+			if l.Empty() {
+				break
+			}
+		}
+
+		for counter = 1; counter != fill; counter++ {
+			tmp[counter].merge(tmp[counter-1], comp)
+		}
+		l.Swap(tmp[fill-1])
+	}
 }
 
 func (l *List) transfer(pos, first, last *ListIter) {
