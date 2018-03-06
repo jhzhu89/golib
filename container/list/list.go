@@ -350,6 +350,9 @@ func (l *List) clear() {
 		tmp.val = nil
 		tmp = nil
 	}
+
+	l.node.next, l.node.prev = l.node, l.node
+	l.setSize(0)
 }
 
 func (l *List) defaultInitialize(n int) {
@@ -431,6 +434,8 @@ func (l *List) rangeAssign(first2, last2 InputIter) {
 	first2 = first2.Clone().(InputIter)
 	for !first1.EqualTo(last1) && !first2.EqualTo(last2) {
 		first1.DerefSet(first2.Deref())
+		first1.Next()
+		first2.Next()
 	}
 
 	if first2.EqualTo(last2) {
