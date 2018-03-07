@@ -12,7 +12,7 @@ func TestAdvance(t *testing.T) {
 		test := func(it InputIterator, n int) {
 			defer func() {
 				r := recover()
-				assert.Contains(t, fmt.Sprintf("%s", r), `can move backward`)
+				assert.Contains(t, fmt.Sprintf("%s", r), `only can move forward`)
 			}()
 
 			Advance(it, n)
@@ -45,10 +45,10 @@ func TestAdvance(t *testing.T) {
 func TestDistance(t *testing.T) {
 	t.Run(`Ok`, func(t *testing.T) {
 		test := func(a, b InputIter) {
-			defer func() {
-				r := recover()
-				assert.Empty(t, r)
-			}()
+			//defer func() {
+			//	r := recover()
+			//	assert.Empty(t, r)
+			//}()
 
 			Distance(a, b)
 		}

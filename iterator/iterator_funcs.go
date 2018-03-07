@@ -5,28 +5,27 @@ import (
 )
 
 func Advance(it InputIter, n int) {
-	if n >= 0 {
-		switch v := it.(type) {
-		case RandIter:
-			v.NextN(n)
+	switch v := it.(type) {
+	case RandIter:
+		v.NextN(n)
 
-		default:
-			for i := n; i > 0; i-- {
+	case BidirectIter:
+		if n > 0 {
+			for ; n > 0; n-- {
 				v.Next()
 			}
-		}
-	} else {
-		switch v := it.(type) {
-		case RandIter:
-			v.PrevN(n)
-
-		case BidirectIter:
-			for i := n; i > 0; i-- {
+		} else {
+			for ; n < 0; n++ {
 				v.Prev()
 			}
+		}
 
-		default:
-			panic(fmt.Sprintf("only %v, %v can move backward", Bidirectional, RandomAccess))
+	default:
+		if n < 0 {
+			panic(fmt.Sprintf("%s only can move forward", Input))
+		}
+		for ; n > 0; n-- {
+			v.Next()
 		}
 	}
 }

@@ -25,6 +25,10 @@ func (it *ReverseIterator) Clone() IterRef {
 	return &ReverseIterator{it.iter, it.canOutput, it.canRandAccess}
 }
 
+func (it *ReverseIterator) Clone2() *ReverseIterator {
+	return &ReverseIterator{it.iter, it.canOutput, it.canRandAccess}
+}
+
 func (it *ReverseIterator) CopyAssign(r IterCRef) {
 	var r_ = r.(*ReverseIterator)
 	it.iter = r_.iter.(BidirectIter).Clone().(BidirectIter)
@@ -48,7 +52,9 @@ func (it *ReverseIterator) CanRandAccess() bool {
 }
 
 func (it *ReverseIterator) Deref() Value {
-	return it.iter.Deref()
+	var tmp = it.iter.Clone().(BidirectIter)
+	tmp.Prev()
+	return tmp.Deref()
 }
 
 func (it *ReverseIterator) DerefSet(val Value) {
@@ -66,8 +72,18 @@ func (it *ReverseIterator) Next() {
 	it.iter.Prev()
 }
 
+func (it *ReverseIterator) Next2() *ReverseIterator {
+	it.Next()
+	return it
+}
+
 func (it *ReverseIterator) Prev() {
 	it.iter.Next()
+}
+
+func (it *ReverseIterator) Prev2() *ReverseIterator {
+	it.Prev()
+	return it
 }
 
 func (it *ReverseIterator) LessThan(r IterCRef) bool {
@@ -84,11 +100,21 @@ func (it *ReverseIterator) NextN(n int) {
 	it.iter.(RandIter).PrevN(n)
 }
 
+func (it *ReverseIterator) NextN2(n int) *ReverseIterator {
+	it.NextN(n)
+	return it
+}
+
 func (it *ReverseIterator) PrevN(n int) {
 	if !it.canRandAccess {
 		panic("not a RandomAccessIterator")
 	}
 	it.iter.(RandomAccessIterator).NextN(n)
+}
+
+func (it *ReverseIterator) PrevN2(n int) *ReverseIterator {
+	it.PrevN(n)
+	return it
 }
 
 // r - it

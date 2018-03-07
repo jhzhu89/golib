@@ -4,7 +4,6 @@ type dummyBase struct{}
 
 func (it *dummyBase) CopyAssign(_ IterCRef) {}
 func (it *dummyBase) Swap(_ IterCRef)       {}
-func (it *dummyBase) Clone() IterRef        { return nil }
 
 var _ InputIterator = (*inputIt)(nil)
 
@@ -15,14 +14,7 @@ type inputIt struct {
 func (it *inputIt) Deref() Value            { return nil }
 func (it *inputIt) Next()                   {}
 func (it *inputIt) EqualTo(r IterCRef) bool { return true }
-
-//var _ OutputIterator = (*outputIt)(nil)
-//
-//type outputIt struct{}
-//
-//func (it *outputIt) Set(_ Value) {}
-//func (it *outputIt) Get() Value  { return nil }
-//func (it *outputIt) Next()       {}
+func (it *inputIt) Clone() IterRef          { return &inputIt{it.dummyBase} }
 
 var _ ForwardIterator = (*forwardIt)(nil)
 
@@ -35,6 +27,7 @@ func (it *forwardIt) DerefSet(_ Value)        {}
 func (it *forwardIt) Deref() Value            { return nil }
 func (it *forwardIt) Next()                   {}
 func (it *forwardIt) EqualTo(_ IterCRef) bool { return true }
+func (it *forwardIt) Clone() IterRef          { return &forwardIt{it.dummyBase} }
 
 var _ BidirectionalIterator = (*bidirectIt)(nil)
 
@@ -48,6 +41,7 @@ func (it *bidirectIt) Deref() Value            { return nil }
 func (it *bidirectIt) Next()                   {}
 func (it *bidirectIt) Prev()                   {}
 func (it *bidirectIt) EqualTo(_ IterCRef) bool { return true }
+func (it *bidirectIt) Clone() IterRef          { return &bidirectIt{it.dummyBase} }
 
 var _ RandomAccessIterator = (*randIt)(nil)
 
