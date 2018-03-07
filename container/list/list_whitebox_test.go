@@ -5,6 +5,7 @@ import (
 
 	"github.com/jhzhu89/golib/container/testutil/vec"
 	"github.com/jhzhu89/golib/fn"
+	"github.com/jhzhu89/golib/iterator"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -313,15 +314,53 @@ func TestSort(t *testing.T) {
 }
 
 func TestResizePos(t *testing.T) {
-	t.Error("TODO")
+	t.Run(`Empty`, func(t *testing.T) {
+		l, n := New(), 1024
+		it, sz := l.resizePos(n)
+		assert.True(t, l.End().EqualTo(it))
+		assert.Equal(t, n, sz)
+	})
+
+	t.Run(`NonEmpty`, func(t *testing.T) {
+		n := 1024
+		l := NewN(n / 2)
+		it, sz := l.resizePos(n)
+		assert.True(t, l.End().EqualTo(it))
+		assert.Equal(t, n/2, sz)
+	})
 }
 
 func TestDefaultAppend(t *testing.T) {
-	t.Error("TODO")
+	t.Run(`Empty`, func(t *testing.T) {
+		l, n := New(), 1024
+		l.defaultAppend(n)
+		assert.Equal(t, n, l.Size())
+		for it := l.Begin(); !it.EqualTo(l.End()); it.Next() {
+			assert.Nil(t, it.Deref())
+		}
+	})
+
+	t.Run(`NonEmpty`, func(t *testing.T) {
+		n := 1024
+		l := NewNValues(n/2, 1)
+		l.defaultAppend(n)
+		assert.Equal(t, n+n/2, l.Size())
+		it := l.Begin()
+		iterator.Advance(it, n/2)
+		for ; !it.EqualTo(l.End()); it.Next() {
+			assert.Nil(t, it.Deref())
+		}
+	})
 }
 
 func TestDistance(t *testing.T) {
-	t.Error("TODO")
+	l := New()
+	assert.Equal(t, 0, l.distance(l.Begin().node, l.End().node))
+	l.PushBack(1)
+	assert.Equal(t, 1, l.distance(l.Begin().node, l.End().node))
+	l.PushBack(1)
+	assert.Equal(t, 2, l.distance(l.Begin().node, l.End().node))
+	assert.Equal(t, 1, l.distance(l.Begin().node, l.Begin().Next2().node))
 }
 
 func TestListNode(t *testing.T) {
