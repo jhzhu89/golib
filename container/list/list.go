@@ -290,7 +290,7 @@ func (l *List) Unique() {
 		} else {
 			first = next
 		}
-		next = first.Next2()
+		next = first.Clone2().Next2()
 	}
 }
 
@@ -308,7 +308,7 @@ func (l *List) UniqueIf(binPred fn.BinaryPredicator) {
 		} else {
 			first = next
 		}
-		next = first.Next2()
+		next = first.Clone2().Next2()
 	}
 }
 

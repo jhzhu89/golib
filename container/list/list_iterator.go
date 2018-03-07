@@ -6,12 +6,12 @@ package list
 
 var _ BidirectIter = (*ListIter)(nil)
 
-// ListIter implements a forward iterator.
+// ListIter implements a bidirectional iterator.
 type ListIter struct {
 	node *listNode
 }
 
-// CanMultiPass indicates this is a forward iterator.
+// CanMultiPass indicates this is a bidirectional iterator.
 func (it *ListIter) CanMultiPass() {}
 
 // CopyAssign assgins given iterator to this iterator.
