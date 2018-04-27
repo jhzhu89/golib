@@ -111,8 +111,8 @@ func (it *DequeIter) PrevN2(n int) *DequeIter {
 	return it
 }
 
-// Clone2 returns a copy of it.
-func (it *DequeIter) Clone2() *DequeIter {
+// clone returns a copy of it.
+func (it *DequeIter) clone() *DequeIter {
 	return &DequeIter{it.cur, it.node, it.map_}
 }
 

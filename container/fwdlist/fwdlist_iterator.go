@@ -60,8 +60,8 @@ func (it *ForwardListIter) Clone() IterRef {
 	return &ForwardListIter{it.node}
 }
 
-// Clone2 returns a copy of it.
-func (it *ForwardListIter) Clone2() *ForwardListIter {
+// clone returns a copy of it.
+func (it *ForwardListIter) clone() *ForwardListIter {
 	return &ForwardListIter{it.node}
 }
 

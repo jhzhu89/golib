@@ -63,8 +63,8 @@ func (it *ListIter) Clone() IterRef {
 	return &ListIter{it.node}
 }
 
-// Clone2 returns a copy of it.
-func (it *ListIter) Clone2() *ListIter {
+// clone returns a copy of it.
+func (it *ListIter) clone() *ListIter {
 	return &ListIter{it.node}
 }
 

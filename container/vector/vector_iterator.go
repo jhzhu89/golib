@@ -86,8 +86,8 @@ func (it *VectorIter) PrevN2(n int) *VectorIter {
 	return it
 }
 
-// Clone2 returns a copy of it.
-func (it *VectorIter) Clone2() *VectorIter {
+// clone returns a copy of it.
+func (it *VectorIter) clone() *VectorIter {
 	return &VectorIter{it.cur, it.data}
 }
 

@@ -25,10 +25,6 @@ func (it *ReverseIterator) Clone() IterRef {
 	return &ReverseIterator{it.iter, it.canOutput, it.canRandAccess}
 }
 
-func (it *ReverseIterator) Clone2() *ReverseIterator {
-	return &ReverseIterator{it.iter, it.canOutput, it.canRandAccess}
-}
-
 func (it *ReverseIterator) CopyAssign(r IterCRef) {
 	var r_ = r.(*ReverseIterator)
 	it.iter = r_.iter.(BidirectIter).Clone().(BidirectIter)

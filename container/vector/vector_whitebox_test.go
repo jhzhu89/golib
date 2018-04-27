@@ -217,7 +217,7 @@ func TestInsertAux(t *testing.T) {
 	var n = 512
 	var v = NewN(n)
 	v.PushBack(nil) // double its capacity
-	var pos = v.start.Clone2().NextN2(n / 2)
+	var pos = v.start.clone().NextN2(n / 2)
 
 	var val = 1
 	v.insertAux(pos, val)

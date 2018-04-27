@@ -72,14 +72,14 @@ func NewFromRange(first, last InputIter) *Vector {
 // Begin returns a read/write iterator that points to the first element in the
 // Vector. Iteration is done in ordinary element order.
 func (v *Vector) Begin() *VectorIter {
-	return v.start.Clone2()
+	return v.start.clone()
 }
 
 // End returns a read/write iterator that points one past the last
 // element in the Vector. Iteration is done in ordinary
 // element order.
 func (v *Vector) End() *VectorIter {
-	return v.finish.Clone2()
+	return v.finish.clone()
 }
 
 // RBegin returns a read/write reverse iterator that points to the
@@ -166,21 +166,21 @@ func (v *Vector) Insert(pos *VectorIter, val Value) *VectorIter {
 		(*v.data)[v.finish.cur] = val
 		v.finish.cur++
 	} else {
-		v.insertAux(v.start.Clone2().NextN2(n), val)
+		v.insertAux(v.start.clone().NextN2(n), val)
 	}
-	return v.start.Clone2().NextN2(n)
+	return v.start.clone().NextN2(n)
 }
 
 // RangeInsert inserts a range into the Vector.
 func (v *Vector) RangeInsert(pos *VectorIter, first, last InputIter) *VectorIter {
 	v.rangeInsert(pos, first, last)
-	return pos.Clone2()
+	return pos.clone()
 }
 
 // FillInsert inserts a number of copies of given data into the Vector.
 func (v *Vector) FillInsert(pos *VectorIter, n int, val Value) *VectorIter {
 	v.fillInsert(pos, n, val)
-	return pos.Clone2()
+	return pos.clone()
 }
 
 // Erase removes element at given position.
@@ -222,7 +222,7 @@ func (v *Vector) Resize(newSize int) {
 	if newSize > len {
 		v.defaultAppend(newSize - len)
 	} else if newSize < len {
-		v.eraseAtEnd(v.start.Clone2().NextN2(newSize))
+		v.eraseAtEnd(v.start.clone().NextN2(newSize))
 	}
 }
 
@@ -233,7 +233,7 @@ func (v *Vector) FillResize(newSize int, val Value) {
 	if newSize > len {
 		v.fillInsert(v.End(), newSize-len, val)
 	} else if newSize < len {
-		v.eraseAtEnd(v.start.Clone2().NextN2(newSize))
+		v.eraseAtEnd(v.start.clone().NextN2(newSize))
 	}
 }
 
@@ -252,7 +252,7 @@ func (v *Vector) fillAssign(n int, val Value) {
 		if n > v.Capacity() {
 			v.extend(n - v.Capacity())
 		}
-		algorithm.Fill(v.start, v.start.Clone2().NextN2(n), val)
+		algorithm.Fill(v.start, v.start.clone().NextN2(n), val)
 		v.finish.cur += n
 	} else {
 		v.eraseAtEnd(algorithm.FillN(v.start, n, val).(*VectorIter))
@@ -264,9 +264,9 @@ func (v *Vector) fillInsert(pos *VectorIter, n int, val Value) {
 		if v.endOfStorage.cur-v.finish.cur < n {
 			v.extend(v.checkLen(n) - v.Size())
 		}
-		algorithm.CopyBackward(pos, v.finish, v.finish.Clone2().NextN2(n))
+		algorithm.CopyBackward(pos, v.finish, v.finish.clone().NextN2(n))
 		v.finish.NextN(n)
-		algorithm.Fill(pos, pos.Clone2().NextN2(n), val)
+		algorithm.Fill(pos, pos.clone().NextN2(n), val)
 	}
 }
 
@@ -296,7 +296,7 @@ func (v *Vector) rangeInsert(pos *VectorIter, first, last InputIter) {
 			if v.endOfStorage.cur-v.finish.cur < n {
 				v.extend(v.checkLen(n) - v.Size())
 			}
-			algorithm.CopyBackward(pos, v.finish, v.finish.Clone2().NextN2(n))
+			algorithm.CopyBackward(pos, v.finish, v.finish.clone().NextN2(n))
 			v.finish.NextN(n)
 			algorithm.Copy(first, last, pos)
 		}
@@ -316,7 +316,7 @@ func (v *Vector) checkLen(n int) int {
 func (v *Vector) insertAux(pos *VectorIter, val Value) {
 	(*v.data)[v.finish.cur] = (*v.data)[v.finish.cur-1]
 	v.finish.cur++
-	algorithm.CopyBackward(pos, v.finish.Clone2().PrevN2(2), v.finish.Clone2().PrevN2(1))
+	algorithm.CopyBackward(pos, v.finish.clone().PrevN2(2), v.finish.clone().PrevN2(1))
 	pos.DerefSet(val)
 }
 
@@ -335,13 +335,13 @@ func (v *Vector) eraseAtEnd(pos *VectorIter) {
 }
 
 func (v *Vector) erase(pos *VectorIter) *VectorIter {
-	var nextToPos = pos.Clone2().Next2()
+	var nextToPos = pos.clone().Next2()
 	if !nextToPos.EqualTo(v.finish) {
 		algorithm.Copy(nextToPos, v.finish, pos)
 	}
 	v.finish.cur--
 	(*v.data)[v.finish.cur] = nil
-	return pos.Clone2()
+	return pos.clone()
 }
 
 func (v *Vector) rangeErase(first, last *VectorIter) *VectorIter {
@@ -349,9 +349,9 @@ func (v *Vector) rangeErase(first, last *VectorIter) *VectorIter {
 		if !last.EqualTo(v.finish) {
 			algorithm.Copy(last, v.finish, first)
 		}
-		v.eraseAtEnd(first.Clone2().NextN2(last.Distance(v.finish)))
+		v.eraseAtEnd(first.clone().NextN2(last.Distance(v.finish)))
 	}
-	return first.Clone2()
+	return first.clone()
 }
 
 func (v *Vector) assignAux(first, last InputIter) {
@@ -368,7 +368,7 @@ func (v *Vector) assignAux(first, last InputIter) {
 		}
 
 	default:
-		var cur = v.start.Clone2()
+		var cur = v.start.clone()
 		for first = first.Clone().(InputIter); !first.EqualTo(last) &&
 			!cur.EqualTo(v.finish); first.Next() {
 			cur.DerefSet(first.Deref())
