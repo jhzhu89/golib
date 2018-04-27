@@ -256,7 +256,7 @@ func (l *List) RangeSplice(pos *ListIter, list *List, first, last *ListIter) {
 func (l *List) Remove(val Value) {
 	var first, last = l.Begin(), l.End()
 	for !first.EqualTo(last) {
-		var next = first.clone().Next2()
+		var next = first.clone().next()
 		if first.Deref() == val {
 			l.erase(first)
 		}
@@ -268,7 +268,7 @@ func (l *List) Remove(val Value) {
 func (l *List) RemoveIf(pred fn.Predicator) {
 	var first, last = l.Begin(), l.End()
 	for !first.EqualTo(last) {
-		var next = first.clone().Next2()
+		var next = first.clone().next()
 		if pred.Predicate(first.Deref()) {
 			l.erase(first)
 		}
@@ -283,14 +283,14 @@ func (l *List) Unique() {
 		return
 	}
 
-	var next = first.clone().Next2()
+	var next = first.clone().next()
 	for !next.EqualTo(last) {
 		if first.Deref() == next.Deref() {
 			l.erase(next)
 		} else {
 			first = next
 		}
-		next = first.clone().Next2()
+		next = first.clone().next()
 	}
 }
 
@@ -301,14 +301,14 @@ func (l *List) UniqueIf(binPred fn.BinaryPredicator) {
 		return
 	}
 
-	var next = first.clone().Next2()
+	var next = first.clone().next()
 	for !next.EqualTo(last) {
 		if binPred.Predicate(first.Deref(), next.Deref()) {
 			l.erase(next)
 		} else {
 			first = next
 		}
-		next = first.clone().Next2()
+		next = first.clone().next()
 	}
 }
 
@@ -451,7 +451,7 @@ func (l *List) merge(list *List, comp fn.Compatator) {
 
 	for !first1.EqualTo(last1) && !first2.EqualTo(last2) {
 		if comp.Compare(first2.Deref(), first1.Deref()) {
-			var next = first2.clone().Next2()
+			var next = first2.clone().next()
 			l.transfer(first1, first2, next)
 			first2 = next
 		} else {

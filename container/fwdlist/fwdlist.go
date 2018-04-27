@@ -161,7 +161,7 @@ func (fl *ForwardList) Resize(newSize int) {
 	var k = fl.BeforeBegin()
 
 	var len = 0
-	for *k.next() != *fl.End() && len < newSize {
+	for *k.makeNext() != *fl.End() && len < newSize {
 		k.Next()
 		len++
 	}
@@ -178,7 +178,7 @@ func (fl *ForwardList) FillResize(newSize int, val Value) {
 	var k = fl.BeforeBegin()
 
 	var len = 0
-	for *k.next() != *fl.End() && len < newSize {
+	for *k.makeNext() != *fl.End() && len < newSize {
 		k.Next()
 		len++
 	}
@@ -271,7 +271,7 @@ func (fl *ForwardList) UniqueIf(binPred fn.BinaryPredicator) {
 	}
 	var next = first.clone()
 	// ++next != last
-	for !next.Next2().EqualTo(last) {
+	for !next.next().EqualTo(last) {
 		if binPred.Predicate(first.Deref(), next.Deref()) {
 			fl.eraseAfter(first.node)
 		} else {

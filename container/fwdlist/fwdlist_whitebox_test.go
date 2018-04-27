@@ -90,11 +90,11 @@ func TestSpliceAfter(t *testing.T) {
 
 	var it = fl1.spliceAfter(fl1.BeforeBegin(), fl2.BeforeBegin(), fl2.End())
 	assert.Equal(t, 2, it.node.val)
-	it = it.next()
+	it = it.makeNext()
 	assert.Nil(t, it.node)
 
 	assert.Equal(t, 3, fl1.Begin().Deref())
-	assert.Equal(t, 2, fl1.Begin().Next2().Deref())
+	assert.Equal(t, 2, fl1.Begin().next().Deref())
 
 	fl3 := New()
 	fl3.insertAfter(fl3.BeforeBegin(), 4)

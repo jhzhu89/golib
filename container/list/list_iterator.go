@@ -41,8 +41,8 @@ func (it *ListIter) Next() {
 	it.node = it.node.next
 }
 
-// Next2 moves an iterator forward.
-func (it *ListIter) Next2() *ListIter {
+// next moves an iterator forward.
+func (it *ListIter) next() *ListIter {
 	it.Next()
 	return it
 }
@@ -71,12 +71,4 @@ func (it *ListIter) clone() *ListIter {
 // EqualTo checks if given iterator is equal to this iterator.
 func (it *ListIter) EqualTo(r IterCRef) bool {
 	return *it == *r.(*ListIter)
-}
-
-func (it *ListIter) next() *ListIter {
-	var it_ = &ListIter{}
-	if it.node != nil {
-		it_.node = it.node.next
-	}
-	return it_
 }

@@ -18,7 +18,9 @@ func TestIter(t *testing.T) {
 		l.PushBack(3)
 
 		assert.Equal(t, 3, l.RBegin().Deref())
-		assert.Equal(t, 1, l.REnd().Prev2().Deref())
+		re := l.REnd()
+		re.Prev()
+		assert.Equal(t, 1, re.Deref())
 
 		it := l.RBegin()
 		for _, n := range []int{3, 2, 1} {
@@ -265,7 +267,9 @@ func TestUnique(t *testing.T) {
 	l.Unique()
 	assert.Equal(t, 3, l.Size())
 	assert.Equal(t, 1, l.Begin().Deref())
-	assert.Equal(t, 'c', l.Begin().Next2().Deref())
+	b := l.Begin()
+	b.Next()
+	assert.Equal(t, 'c', b.Deref())
 	assert.Nil(t, l.End().Prev2().Deref())
 }
 
