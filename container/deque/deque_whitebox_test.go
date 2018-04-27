@@ -68,12 +68,12 @@ func TestFillInsert(t *testing.T) {
 	test(d, d.End(), DequeBufSize, 0, 3, 1, 4, DequeBufSize+1, 2, false)
 
 	d = NewN(10)
-	test(d, d.Begin().NextN2(5), 1, 0, 3, 11, 3, 11, 1, false)
+	test(d, d.Begin().nextN(5), 1, 0, 3, 11, 3, 11, 1, false)
 	d = NewN(10)
-	test(d, d.Begin().NextN2(5), DequeBufSize, 0, 3, 10, 4, DequeBufSize+10, 2, false)
+	test(d, d.Begin().nextN(5), DequeBufSize, 0, 3, 10, 4, DequeBufSize+10, 2, false)
 
 	d = NewN(10)
-	test(d, d.Begin().NextN2(5), 8*DequeBufSize, 0, 4, 10, 12, 8*DequeBufSize+10, 9, false)
+	test(d, d.Begin().nextN(5), 8*DequeBufSize, 0, 4, 10, 12, 8*DequeBufSize+10, 9, false)
 }
 
 func TestNewElementsAt(t *testing.T) {
@@ -143,11 +143,11 @@ func TestEraseAt(t *testing.T) {
 		var d = NewN(2 * DequeBufSize)
 		d.FillAssign(2*DequeBufSize, 1)
 
-		var pos = d.Begin().NextN2(DequeBufSize - 1)
+		var pos = d.Begin().nextN(DequeBufSize - 1)
 		d.eraseAtBegin(pos)
 		assert.Equal(t, DequeBufSize-1, d.start.cur)
 		assert.Equal(t, 3, countNonNilNodes(d))
-		pos = pos.Next2()
+		pos = pos.next()
 		d.eraseAtBegin(pos)
 		assert.Equal(t, 0, d.start.cur)
 		assert.Equal(t, 2, countNonNilNodes(d))
@@ -157,11 +157,11 @@ func TestEraseAt(t *testing.T) {
 		var d = NewN(2 * DequeBufSize)
 		d.FillAssign(2*DequeBufSize, 1)
 
-		var pos = d.Begin().NextN2(DequeBufSize)
+		var pos = d.Begin().nextN(DequeBufSize)
 		d.eraseAtEnd(pos)
 		assert.Equal(t, 0, d.finish.cur)
 		assert.Equal(t, 2, countNonNilNodes(d))
-		pos = pos.Prev2()
+		pos = pos.prev()
 		d.eraseAtEnd(pos)
 		assert.Equal(t, DequeBufSize-1, d.finish.cur)
 		assert.Equal(t, 1, countNonNilNodes(d))
@@ -273,7 +273,7 @@ func TestDequeMethodsWhitebox(t *testing.T) {
 				test(NewN(1), popFront, 1, 1, 3, 1, 3, 0, true)
 
 				var d = NewN(2 * DequeBufSize)
-				d.eraseAtBegin(d.Begin().NextN2(DequeBufSize - 1))
+				d.eraseAtBegin(d.Begin().nextN(DequeBufSize - 1))
 				test(d, popFront, 2, 0, 3, 0, 4, DequeBufSize, false)
 			})
 		})

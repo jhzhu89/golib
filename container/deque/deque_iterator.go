@@ -87,32 +87,32 @@ func (it *DequeIter) PrevN(n int) {
 	it.NextN(-n)
 }
 
-// Next2 moves an iterator forward.
-func (it *DequeIter) Next2() *DequeIter {
+// next moves an iterator forward.
+func (it *DequeIter) next() *DequeIter {
 	it.Next()
 	return it
 }
 
-// Prev2 moves an iterator backward.
-func (it *DequeIter) Prev2() *DequeIter {
+// prev moves an iterator backward.
+func (it *DequeIter) prev() *DequeIter {
 	it.Prev()
 	return it
 }
 
-// NextN2 moves an iterator forward by n.
-func (it *DequeIter) NextN2(n int) *DequeIter {
+// nextN moves an iterator forward by n.
+func (it *DequeIter) nextN(n int) *DequeIter {
 	it.NextN(n)
 	return it
 }
 
-// PrevN2 moves an iterator backward by n.
-func (it *DequeIter) PrevN2(n int) *DequeIter {
+// prevN moves an iterator backward by n.
+func (it *DequeIter) prevN(n int) *DequeIter {
 	it.PrevN(n)
 	return it
 }
 
-// Clone2 returns a copy of it.
-func (it *DequeIter) Clone2() *DequeIter {
+// clone returns a copy of it.
+func (it *DequeIter) clone() *DequeIter {
 	return &DequeIter{it.cur, it.node, it.map_}
 }
 

@@ -62,32 +62,32 @@ func (it *VectorIter) PrevN(n int) {
 	it.NextN(-n)
 }
 
-// Next2 moves an iterator forward.
-func (it *VectorIter) Next2() *VectorIter {
+// next moves an iterator forward.
+func (it *VectorIter) next() *VectorIter {
 	it.Next()
 	return it
 }
 
-// Prev2 moves an iterator backward.
-func (it *VectorIter) Prev2() *VectorIter {
+// prev moves an iterator backward.
+func (it *VectorIter) prev() *VectorIter {
 	it.Prev()
 	return it
 }
 
-// NextN2 moves an iterator forward by n.
-func (it *VectorIter) NextN2(n int) *VectorIter {
+// nextN moves an iterator forward by n.
+func (it *VectorIter) nextN(n int) *VectorIter {
 	it.NextN(n)
 	return it
 }
 
-// PrevN2 moves an iterator backward by n.
-func (it *VectorIter) PrevN2(n int) *VectorIter {
+// prevN moves an iterator backward by n.
+func (it *VectorIter) prevN(n int) *VectorIter {
 	it.PrevN(n)
 	return it
 }
 
-// Clone2 returns a copy of it.
-func (it *VectorIter) Clone2() *VectorIter {
+// clone returns a copy of it.
+func (it *VectorIter) clone() *VectorIter {
 	return &VectorIter{it.cur, it.data}
 }
 

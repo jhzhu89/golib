@@ -115,7 +115,7 @@ func (fl *ForwardList) RangeInsertAfter(pos *ForwardListIter, first, last InputI
 	if !tmp.Empty() {
 		return fl.spliceAfter(pos, tmp.BeforeBegin(), tmp.End())
 	} else {
-		return pos.Clone2()
+		return pos.clone()
 	}
 }
 
@@ -161,7 +161,7 @@ func (fl *ForwardList) Resize(newSize int) {
 	var k = fl.BeforeBegin()
 
 	var len = 0
-	for *k.next() != *fl.End() && len < newSize {
+	for *k.makeNext() != *fl.End() && len < newSize {
 		k.Next()
 		len++
 	}
@@ -178,7 +178,7 @@ func (fl *ForwardList) FillResize(newSize int, val Value) {
 	var k = fl.BeforeBegin()
 
 	var len = 0
-	for *k.next() != *fl.End() && len < newSize {
+	for *k.makeNext() != *fl.End() && len < newSize {
 		k.Next()
 		len++
 	}
@@ -269,15 +269,15 @@ func (fl *ForwardList) UniqueIf(binPred fn.BinaryPredicator) {
 	if first.EqualTo(last) {
 		return
 	}
-	var next = first.Clone2()
+	var next = first.clone()
 	// ++next != last
-	for !next.Next2().EqualTo(last) {
+	for !next.next().EqualTo(last) {
 		if binPred.Predicate(first.Deref(), next.Deref()) {
 			fl.eraseAfter(first.node)
 		} else {
-			first = next.Clone2()
+			first = next.clone()
 		}
-		next = first.Clone2()
+		next = first.clone()
 	}
 }
 
@@ -360,7 +360,7 @@ func (fl *ForwardList) spliceAfter(pos, before, last *ForwardListIter) *ForwardL
 }
 
 func (fl *ForwardList) spliceElementAfter(pos *ForwardListIter, i *ForwardListIter) {
-	var j = i.Clone2()
+	var j = i.clone()
 	j.Next()
 
 	if pos.EqualTo(i) || pos.EqualTo(j) {

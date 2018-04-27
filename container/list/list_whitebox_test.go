@@ -177,7 +177,7 @@ func TestSpliceList(t *testing.T) {
 			l2.PushBack(i + n)
 		}
 
-		l1.spliceList(l1.Begin().Next2().Next2(), l2)
+		l1.spliceList(l1.Begin().next().next(), l2)
 		assert.Equal(t, 0, l2.Size())
 		assert.Equal(t, n*2, l1.Size())
 
@@ -220,7 +220,7 @@ func TestSplice(t *testing.T) {
 		l1.spliceElement(l1.End(), l2, l2.End().Prev2())
 		check(l1, l2, n+2, n-2, []int{5, 0, 1, 2, 3, 4, 9}, []int{6, 7, 8})
 
-		l1.spliceElement(l1.Begin().Next2().Next2(), l2, l2.End().Prev2().Prev2())
+		l1.spliceElement(l1.Begin().next().next(), l2, l2.End().Prev2().Prev2())
 		check(l1, l2, n+3, n-3, []int{5, 0, 7, 1, 2, 3, 4, 9}, []int{6, 8})
 	})
 
@@ -231,7 +231,7 @@ func TestSplice(t *testing.T) {
 			l2.PushBack(i + n)
 		}
 
-		l1.rangeSplice(l1.Begin(), l2, l2.Begin(), l2.Begin().Next2())
+		l1.rangeSplice(l1.Begin(), l2, l2.Begin(), l2.Begin().next())
 		check(l1, l2, n+1, n-1, []int{5, 0, 1, 2, 3, 4}, []int{6, 7, 8, 9})
 
 		l1.rangeSplice(l1.End(), l2, l2.Begin(), l2.End())
@@ -268,7 +268,7 @@ func TestRangeAssign(t *testing.T) {
 	assert.Equal(t, n-1, l.Size())
 	assert.Equal(t, n, l1.Size())
 
-	l.rangeAssign(l1.Begin(), l1.Begin().Next2())
+	l.rangeAssign(l1.Begin(), l1.Begin().next())
 	assert.Equal(t, 1, l.Size())
 	assert.Equal(t, n, l1.Size())
 }
@@ -360,7 +360,7 @@ func TestDistance(t *testing.T) {
 	assert.Equal(t, 1, l.distance(l.Begin().node, l.End().node))
 	l.PushBack(1)
 	assert.Equal(t, 2, l.distance(l.Begin().node, l.End().node))
-	assert.Equal(t, 1, l.distance(l.Begin().node, l.Begin().Next2().node))
+	assert.Equal(t, 1, l.distance(l.Begin().node, l.Begin().next().node))
 }
 
 func TestListNode(t *testing.T) {

@@ -41,13 +41,13 @@ func (it *ForwardListIter) Next() {
 	it.node = it.node.next
 }
 
-// Next2 moves an iterator forward.
-func (it *ForwardListIter) Next2() *ForwardListIter {
+// next moves an iterator forward.
+func (it *ForwardListIter) next() *ForwardListIter {
 	it.Next()
 	return it
 }
 
-func (it *ForwardListIter) next() *ForwardListIter {
+func (it *ForwardListIter) makeNext() *ForwardListIter {
 	var it_ = &ForwardListIter{}
 	if it.node != nil {
 		it_.node = it.node.next
@@ -60,8 +60,8 @@ func (it *ForwardListIter) Clone() IterRef {
 	return &ForwardListIter{it.node}
 }
 
-// Clone2 returns a copy of it.
-func (it *ForwardListIter) Clone2() *ForwardListIter {
+// clone returns a copy of it.
+func (it *ForwardListIter) clone() *ForwardListIter {
 	return &ForwardListIter{it.node}
 }
 
